@@ -33,7 +33,7 @@ public class MainActivity extends Activity {
         if (id == R.id.action_settings) {
             return true;
         }
-
+//Abdülkadir ramiye yada un kapan?na gidelim
         return super.onOptionsItemSelected(item);
     }
 }
