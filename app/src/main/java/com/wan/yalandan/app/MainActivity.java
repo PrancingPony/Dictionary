@@ -31,15 +31,11 @@ public class MainActivity extends Activity {
     protected void onStart() {
         super.onStart();
 
-        final DictionaryReader dr = new DictionaryReader(R.raw.american_english);
-        try {
-            dr.getWords(getResources().openRawResource(dr.resourcesid));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        final DictionaryReader dr = new DictionaryReader(R.raw.american_english,getBaseContext());
         final TextView tv = (TextView) findViewById(R.id.textView);
 
         tv.setText(dr.get4RandomWord().toString());
+        tv.setText(getBaseContext().getResources().openRawResource(R.raw.american_english).toString());
         Button btn = (Button) findViewById(R.id.btnAnswer);
         btn.setOnClickListener(v -> tv.setText(dr.get4RandomWord().toString()));
     }
