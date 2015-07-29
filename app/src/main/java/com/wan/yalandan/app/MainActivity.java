@@ -25,14 +25,7 @@ public class MainActivity extends Activity {
         init();
         createFolder(getApplicationInfo().dataDir, "xmls");
         // String value = getDataFromInternet("http://www.dictionaryapi.com/api/v1/references/thesaurus/xml/test?key=19cb0d77-2780-4cb1-8015-207cc06d9913&word=book");
-        this.btnDMTest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Download Manager Passing callback
 
-                startActivity(new Intent(getBaseContext(), DownManActivity.class));
-            }
-        });//listener
 
         final DownloadFileProcess.INewInterface downloadFinishedCallback = new DownloadFileProcess.INewInterface() {
             @Override
