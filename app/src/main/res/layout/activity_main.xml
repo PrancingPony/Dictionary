@@ -54,7 +54,7 @@
             android:layout_height="wrap_content"
             android:text="Answer"
             android:id="@+id/btnAnswer" android:layout_alignParentBottom="true" android:layout_centerHorizontal="true"/>
-    <Button
+    Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="DownMan. Test"
@@ -64,5 +64,5 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Callback Test"
-            android:id="@+id/btnCallback" android:layout_above="@+id/btnDMTest" android:layout_centerHorizontal="true"/>
+            android:id="@+id/btnCallback" android:layout_above="@+id/btnAnswer" android:layout_centerHorizontal="true"/>
 </RelativeLayout>

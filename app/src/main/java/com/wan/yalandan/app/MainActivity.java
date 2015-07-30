@@ -1,7 +1,6 @@
 package com.wan.yalandan.app;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -11,10 +10,8 @@ import android.widget.Button;
 
 import java.io.File;
 
-
 public class MainActivity extends Activity {
 
-    Button btnDMTest;
     Button btnCallback;
     DownloadFileProcess dfp;
 
@@ -24,10 +21,8 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         init();
         createFolder(getApplicationInfo().dataDir, "xmls");
-        // String value = getDataFromInternet("http://www.dictionaryapi.com/api/v1/references/thesaurus/xml/test?key=19cb0d77-2780-4cb1-8015-207cc06d9913&word=book");
 
-
-        final DownloadFileProcess.INewInterface downloadFinishedCallback = new DownloadFileProcess.INewInterface() {
+        final DownloadFileProcess.ICallbackUri downloadFinishedCallback = new DownloadFileProcess.ICallbackUri() {
             @Override
             public void callback(String uri) {
                 Log.d("CALLED URI", uri);
@@ -39,6 +34,7 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 dfp = new DownloadFileProcess(downloadFinishedCallback, getBaseContext());
                 dfp.getWordUriFromApi("book");
+
             }
         });
 
@@ -47,7 +43,7 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -60,31 +56,19 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
-//Abdülkadir ramiye yada un kapan?na gidelim
         return super.onOptionsItemSelected(item);
     }
 
-    /*    public String getDataFromInternet(String urlstring)
-        {
-            AsyncTask<String, String, String> task = new RequestTask().execute(urlstring);
-
-            return "";
-        }//method    */
     public void init() {
-        this.btnDMTest = (Button) findViewById(R.id.btnDMTest);
-        this.btnCallback = (Button) findViewById(R.id.btnCallback);
-        // Log.d("TEST",getApplicationInfo().dataDir);
-    }//method
 
+        this.btnCallback = (Button) findViewById(R.id.btnCallback);
+    }
     public void createFolder(String path, String folderName) {
         File folder = new File(path + "/" + folderName);
 
@@ -94,11 +78,10 @@ public class MainActivity extends Activity {
             if (success) {
                 Log.v("Creating Folder Proces", "Folder was created");
             } else {
-                // Do something else on failure
                 Log.v("Creating Folder Proces", "Folder was NOT created");
             }
         } else {
             Log.v("Creating Folder Proces", "Folder is already exist");
         }
     }
-}//activity
+}

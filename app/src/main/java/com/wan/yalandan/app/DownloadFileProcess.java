@@ -5,90 +5,86 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Debug;
 import android.os.Environment;
 import android.util.Log;
 
 import java.io.*;
 import java.util.UUID;
 
-
 public class DownloadFileProcess {
 
     Context ctx;
     private long enqueue;
     private DownloadManager dm;
-    private INewInterface mainClass; //for callback
+    private ICallbackUri callback;
     private DownloadStatusReceiver receiver;
 
-    public DownloadFileProcess(INewInterface mClass, Context _ctx) {
+    public DownloadFileProcess(ICallbackUri _callback, Context _ctx) {
         ctx = _ctx;
-        mainClass = mClass;
+        callback = _callback;
         receiver = new DownloadStatusReceiver(_ctx);
+        // FIXME : Make broadcast receiver global
         ctx.registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
 
-    public String getWordUriFromApi(String word) {
-        /*
-          if(word in DB)
-           return word's Uri from DB
-         */
-        //else
-        {
-            String filename = String.valueOf(UUID.randomUUID());
+    public void getWordUriFromApi(String word) {
+        // TODO : Check first if it is in DB else { below codes will run
+        String filename = String.valueOf(UUID.randomUUID());
 
-            dm = (DownloadManager) ctx.getSystemService(ctx.DOWNLOAD_SERVICE);
-            DownloadManager.Request request = new
-                    DownloadManager.Request(Uri.parse("http://www.dictionaryapi.com/api/v1/references/thesaurus/xml/test?key=19cb0d77-2780-4cb1-8015-207cc06d9913&word=" + word/*book"*/));
+        dm = (DownloadManager) ctx.getSystemService(ctx.DOWNLOAD_SERVICE);
 
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOCUMENTS, filename);
-            enqueue = dm.enqueue(request);
-        }
-        return "";
+        Resources resources = ctx.getResources();
+        String fqdnDictionary = resources.getString(R.string.DictionarySite) + "?key=" + resources.getString(R.string.KeyParam) + "&word=" + word;
+
+        DownloadManager.Request request = new
+                DownloadManager.Request(Uri.parse(fqdnDictionary));
+
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOCUMENTS, filename);
+        enqueue = dm.enqueue(request);
     }
 
-    public void file_CreateAndAddData(String path, String filemane, String data) {
+    public  void fileCreateAndAddData(String path, String filemane, String data) {
 
         File file = new File(path, filemane);
         FileOutputStream fos;
 
-        byte[] veri = data.getBytes();
+        byte[] buffer = data.getBytes();
         try {
             fos = new FileOutputStream(file);
-            fos.write(veri);
+            fos.write(buffer);
             fos.flush();
             fos.close();
-            Log.i("file_Create Method", "File was created succesfully");
         } catch (FileNotFoundException e) {
-            Log.e("file_Create Method", "File was not found");
+            Log.e("file_Create Method", "File not found",e);
         } catch (IOException e) {
-            Log.e("file_Create Method", "There is an exception in file_Create Method");
+            Log.e("file_Create Method", "There is an exception in file_Create Method",e);
         }
     }
 
-    String readFile(String PathAndfileName) throws IOException {
+   public  String readFile(String PathAndfileName) throws IOException {
 
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(new
-                File(/* getApplicationInfo().dataDir + "/xmls/" +  fileName*/ PathAndfileName)));
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(PathAndfileName)));
         String read;
         StringBuilder builder = new StringBuilder("");
 
         while ((read = bufferedReader.readLine()) != null) {
             builder.append(read);
         }
-        Log.d("Output", builder.toString());
         bufferedReader.close();
 
         return builder.toString();
     }
 
-    public interface INewInterface {
-        void callback(String uri);
-    }
-
     public void unregisterReceiver() {
         receiver.unregisterReceiver();
+    }
+
+    public interface ICallbackUri {
+        void callback(String uri);
     }
 
     private class DownloadStatusReceiver extends BroadcastReceiver {
@@ -96,11 +92,13 @@ public class DownloadFileProcess {
         private Context context;
 
         public DownloadStatusReceiver(Context context) {
+            super();
             this.context = context;
         }
 
         @Override
         public void onReceive(Context context, Intent intent) {
+
             if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(intent.getAction())) {
                 DownloadManager.Query query = new DownloadManager.Query();
                 query.setFilterById(enqueue);
@@ -110,25 +108,23 @@ public class DownloadFileProcess {
                     if (DownloadManager.STATUS_SUCCESSFUL == c.getInt(columnIndex)) {
                         String uriString = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
 
-                        Uri myUri = Uri.parse(uriString);
-                        File myFile = new File(myUri.toString());
-                        Log.d("TEST", "Absolute Path : " + myFile.getAbsolutePath().replace("/file:", ""));
+                        Uri stringUri = Uri.parse(uriString);
+                        File uristringsFile = new File(stringUri.toString());
 
-                        String[] seperateToPath = myFile.getAbsolutePath().split("/");//this row is for accessing filename. Because filemane is after last slash(/).
-                        String fileName = seperateToPath[seperateToPath.length - 1];//we took the filename
-                        Log.d("Split Name Result : ", fileName);
+                        String absolutePath = uristringsFile.getAbsolutePath().replace("/file:", "");
+                        String xmlsFilesPath = ctx.getApplicationInfo().dataDir + "/xmls";
+                        String[] seperateToPath = uristringsFile.getAbsolutePath().split("/");
+                        String fileName = seperateToPath[seperateToPath.length - 1];
 
                         try {
-                            String strXmlContent = readFile(myFile.getAbsolutePath().replace("/file:", ""));
-                            Log.d("readFile's Return Value", strXmlContent);
-                            file_CreateAndAddData(ctx.getApplicationInfo().dataDir + "/xmls", fileName, strXmlContent);
-                            Log.d("readFile Aim", readFile(ctx.getApplicationInfo().dataDir + "/xmls/" + fileName));
+                            String XmlContent = readFile(absolutePath);
+                            fileCreateAndAddData(xmlsFilesPath, fileName, XmlContent);
 
-                            File file = new File(myFile.getAbsolutePath().replace("/file:", ""));
+                            File file = new File(absolutePath);
                             boolean deleted = file.delete();
                             if (deleted) Log.d("Delete File", "File was deleted succesfully");
                             else Log.d("Delete File", "File was not deleted");
-                            mainClass.callback(ctx.getApplicationInfo().dataDir + "/xmls/" + fileName);
+                            callback.callback(xmlsFilesPath +"/" + fileName);
                         } catch (IOException e) {
                             Log.e("readFile Error", "There is an error about IO Exception", e);
                         }
@@ -141,4 +137,5 @@ public class DownloadFileProcess {
             ctx.unregisterReceiver(receiver);
         }
     }
+
 }
