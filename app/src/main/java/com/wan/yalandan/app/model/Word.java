@@ -1,6 +1,5 @@
-package model;
+package com.wan.yalandan.app.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

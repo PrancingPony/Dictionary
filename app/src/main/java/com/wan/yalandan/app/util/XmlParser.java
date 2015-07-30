@@ -1,49 +1,85 @@
-package com.wan.yalandan.app;
+package com.wan.yalandan.app.util;
 
-import android.app.Activity;
-import android.os.Bundle;
+import android.content.Context;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import model.Word;
+import com.wan.yalandan.app.model.Word;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
-
-public class MainActivity extends Activity {
-    private static final String LOG_TAG = "MainActivity";
+/**
+ * Created by emre.can on 7/30/2015.
+ */
+public class XmlParser {
+    private static final String LOG_TAG = XmlParser.class.getCanonicalName();
     private final String TAG_HEADWORD = "hw";
-    private final String TAG_FUNCTIONALLABEL = "fl";
-    private final String TAG_MEANINGCORE = "mc";
-    private final String TAG_ILLUSTRATIVESENTENCE = "vi";
+    private final String TAG_FUNCTIONAL_LABEL = "fl";
+    private final String TAG_MEANING_CORE = "mc";
+    private final String TAG_ILLUSTRATIVE_SENTENCE = "vi";
     private final String TAG_SYNONYM = "syn";
-    private final String TAG_RELATEDWORDS = "rel";
+    private final String TAG_RELATED_WORDS = "rel";
     private final String TAG_ANTONYM = "ant";
     private final String TAG_SENSE = "sens";
     private final String TAG_IT = "it";
+    private Context context=null;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        String uri = "corresponding.xml";
-        Word word = XmlPullParser(uri);
-
-        Log.d(LOG_TAG, "inComingWord:" + word.getHeadWord() + "FL: " + word.getFunctionalLabel() + "MC: " + word.getMeaningCore() + "V?: " + word.getIllustrativeSentence() + " REL:" + word.getRelatedWords() + "SYN:" + word.getSynonymList() + "ANT:" + word.getAntonyms());
+    public static String getLogTag() {
+        return LOG_TAG;
     }
 
-    public Word XmlPullParser(String uri) {
+    public String getTAG_HEADWORD() {
+        return TAG_HEADWORD;
+    }
+
+    public String getTAG_FUNCTIONAL_LABEL() {
+        return TAG_FUNCTIONAL_LABEL;
+    }
+
+    public String getTAG_MEANING_CORE() {
+        return TAG_MEANING_CORE;
+    }
+
+    public String getTAG_ILLUSTRATIVE_SENTENCE() {
+        return TAG_ILLUSTRATIVE_SENTENCE;
+    }
+
+    public String getTAG_SYNONYM() {
+        return TAG_SYNONYM;
+    }
+
+    public String getTAG_RELATED_WORDS() {
+        return TAG_RELATED_WORDS;
+    }
+
+    public String getTAG_ANTONYM() {
+        return TAG_ANTONYM;
+    }
+
+    public String getTAG_SENSE() {
+        return TAG_SENSE;
+    }
+
+    public String getTAG_IT() {
+        return TAG_IT;
+    }
+
+    public XmlParser(Context context) {
+        this.context=context;
+    }
+
+    public Word getWordData(String uri) {
         XmlPullParserFactory pullParserFactory;
         try {
             pullParserFactory = XmlPullParserFactory.newInstance();
             XmlPullParser parser = pullParserFactory.newPullParser();
-            InputStream inStream = getApplicationContext().getAssets().open(uri);
+            InputStream inStream = context.getAssets().open(uri);
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(inStream, null);
             return parseXML(parser);
@@ -89,7 +125,7 @@ public class MainActivity extends Activity {
 
                 case XmlPullParser.END_TAG:
                     if (TAG_SENSE.equals(parser.getName())) {
-                        return new Word(hmWordFeature.get(TAG_HEADWORD), hmWordFeature.get(TAG_FUNCTIONALLABEL), hmWordFeature.get(TAG_MEANINGCORE), hmWordFeature.get(TAG_ILLUSTRATIVESENTENCE), SplitTrimString(hmWordFeature.get(TAG_SYNONYM)), SplitTrimString(hmWordFeature.get(TAG_RELATEDWORDS)), SplitTrimString(hmWordFeature.get(TAG_ANTONYM)));
+                        return new Word(hmWordFeature.get(TAG_HEADWORD), hmWordFeature.get(TAG_FUNCTIONAL_LABEL), hmWordFeature.get(TAG_MEANING_CORE), hmWordFeature.get(TAG_ILLUSTRATIVE_SENTENCE), SplitTrimString(hmWordFeature.get(TAG_SYNONYM)), SplitTrimString(hmWordFeature.get(TAG_RELATED_WORDS)), SplitTrimString(hmWordFeature.get(TAG_ANTONYM)));
                     }
             }
             eventType = parser.next();
@@ -103,20 +139,20 @@ public class MainActivity extends Activity {
             case TAG_HEADWORD:
                 hmWordFeature.put(TAG_HEADWORD, parser.getText());
                 break;
-            case TAG_FUNCTIONALLABEL:
-                hmWordFeature.put(TAG_FUNCTIONALLABEL, parser.getText());
+            case TAG_FUNCTIONAL_LABEL:
+                hmWordFeature.put(TAG_FUNCTIONAL_LABEL, parser.getText());
                 break;
-            case TAG_MEANINGCORE:
-                hmWordFeature.put(TAG_MEANINGCORE, parser.getText());
+            case TAG_MEANING_CORE:
+                hmWordFeature.put(TAG_MEANING_CORE, parser.getText());
                 break;
-            case TAG_ILLUSTRATIVESENTENCE:
-                hmWordFeature.put(TAG_ILLUSTRATIVESENTENCE, parser.getText());
+            case TAG_ILLUSTRATIVE_SENTENCE:
+                hmWordFeature.put(TAG_ILLUSTRATIVE_SENTENCE, parser.getText());
                 break;
             case TAG_SYNONYM:
                 hmWordFeature.put(TAG_SYNONYM, parser.getText());
                 break;
-            case TAG_RELATEDWORDS:
-                hmWordFeature.put(TAG_RELATEDWORDS, parser.getText());
+            case TAG_RELATED_WORDS:
+                hmWordFeature.put(TAG_RELATED_WORDS, parser.getText());
                 break;
             case TAG_ANTONYM:
                 hmWordFeature.put(TAG_ANTONYM, parser.getText());
@@ -131,25 +167,5 @@ public class MainActivity extends Activity {
             trimmedWords.add(currentWord.trim());
         }
         return trimmedWords;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 }
