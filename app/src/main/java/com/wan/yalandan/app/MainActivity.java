@@ -7,7 +7,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-
 import java.io.File;
 
 public class MainActivity extends Activity {
@@ -20,7 +19,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
-        createFolder(getApplicationInfo().dataDir, "xmls");
+        DownloadFileProcess.createFolder(getApplicationInfo().dataDir, "xmls");
 
         final DownloadFileProcess.ICallbackUri downloadFinishedCallback = new DownloadFileProcess.ICallbackUri() {
             @Override
@@ -34,12 +33,9 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 dfp = new DownloadFileProcess(downloadFinishedCallback, getBaseContext());
                 dfp.getWordUriFromApi("book");
-
             }
         });
-
-    }//Event
-
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -68,20 +64,5 @@ public class MainActivity extends Activity {
     public void init() {
 
         this.btnCallback = (Button) findViewById(R.id.btnCallback);
-    }
-    public void createFolder(String path, String folderName) {
-        File folder = new File(path + "/" + folderName);
-
-        if (!folder.exists()) {
-            boolean success = false;
-            success = folder.mkdir();
-            if (success) {
-                Log.v("Creating Folder Proces", "Folder was created");
-            } else {
-                Log.v("Creating Folder Proces", "Folder was NOT created");
-            }
-        } else {
-            Log.v("Creating Folder Proces", "Folder is already exist");
-        }
     }
 }

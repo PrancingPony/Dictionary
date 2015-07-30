@@ -8,10 +8,8 @@ import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Debug;
 import android.os.Environment;
 import android.util.Log;
-
 import java.io.*;
 import java.util.UUID;
 
@@ -34,7 +32,6 @@ public class DownloadFileProcess {
     public void getWordUriFromApi(String word) {
         // TODO : Check first if it is in DB else { below codes will run
         String filename = String.valueOf(UUID.randomUUID());
-
         dm = (DownloadManager) ctx.getSystemService(ctx.DOWNLOAD_SERVICE);
 
         Resources resources = ctx.getResources();
@@ -43,13 +40,13 @@ public class DownloadFileProcess {
         DownloadManager.Request request = new
                 DownloadManager.Request(Uri.parse(fqdnDictionary));
 
-                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOCUMENTS, filename);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOCUMENTS, filename);
         enqueue = dm.enqueue(request);
     }
 
-    public  void fileCreateAndAddData(String path, String filemane, String data) {
+    public void createFileAndAddData(String path, String fileName, String data) {
 
-        File file = new File(path, filemane);
+        File file = new File(path, fileName);
         FileOutputStream fos;
 
         byte[] buffer = data.getBytes();
@@ -59,13 +56,13 @@ public class DownloadFileProcess {
             fos.flush();
             fos.close();
         } catch (FileNotFoundException e) {
-            Log.e("file_Create Method", "File not found",e);
+            Log.e("file_Create Method", "File not found", e);
         } catch (IOException e) {
-            Log.e("file_Create Method", "There is an exception in file_Create Method",e);
+            Log.e("file_Create Method", "There is an exception in file_Create Method", e);
         }
     }
 
-   public  String readFile(String PathAndfileName) throws IOException {
+    public String readFile(String PathAndfileName) throws IOException {
 
         BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(PathAndfileName)));
         String read;
@@ -118,13 +115,12 @@ public class DownloadFileProcess {
 
                         try {
                             String XmlContent = readFile(absolutePath);
-                            fileCreateAndAddData(xmlsFilesPath, fileName, XmlContent);
+                            createFileAndAddData(xmlsFilesPath, fileName, XmlContent);
 
                             File file = new File(absolutePath);
                             boolean deleted = file.delete();
-                            if (deleted) Log.d("Delete File", "File was deleted succesfully");
-                            else Log.d("Delete File", "File was not deleted");
-                            callback.callback(xmlsFilesPath +"/" + fileName);
+
+                            callback.callback(xmlsFilesPath + "/" + fileName);
                         } catch (IOException e) {
                             Log.e("readFile Error", "There is an error about IO Exception", e);
                         }
@@ -138,4 +134,19 @@ public class DownloadFileProcess {
         }
     }
 
+    public static void createFolder(String path, String folderName) {
+        File folder = new File(path + "/" + folderName);
+
+        if (!folder.exists()) {
+            boolean success = false;
+            success = folder.mkdir();
+            if (success) {
+                Log.v("Creating Folder Proces", "Folder was created");
+            } else {
+                Log.v("Creating Folder Proces", "Folder was NOT created");
+            }
+        } else {
+            Log.v("Creating Folder Proces", "Folder is already exist");
+        }
+    }
 }
