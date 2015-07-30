@@ -4,9 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
-/**
- * Created by abdulkadir.karabas on 28.07.2015.
- */
 public class DatabaseAdaptor {
     private static final String LOG_TAG = "DATABASE";
     private static DatabaseHelper databaseHelper;

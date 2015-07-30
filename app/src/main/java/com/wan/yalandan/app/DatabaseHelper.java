@@ -5,11 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-/**
- * Created by abdulkadir.karabas on 28.07.2015.
- */
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "DictionaryDb";
     public static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + DatabaseAdaptor.TOKENWORDS_TABLENAME + "(" +
             DatabaseAdaptor.TOKENWORDS_ID + "   INTEGER     PRIMARY KEY AUTOINCREMENT," +
