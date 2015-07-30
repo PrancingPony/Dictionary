@@ -1,10 +1,12 @@
 package com.wan.yalandan.app;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 
-public class DatabaseAdaptor {
+public class DatabaseAdapter {
     private static final String LOG_TAG = "DATABASE";
     private static DatabaseHelper databaseHelper;
     public static final String TOKENWORDS_TABLENAME = "TakenWords";
@@ -12,17 +14,18 @@ public class DatabaseAdaptor {
     public static final String TOKENWORDS_WORD = "Word";
     public static final String TOKENWORDS_URI = "Uri";
 
-    public DatabaseAdaptor(Context ctx) {
+    public DatabaseAdapter(Context ctx) {
         databaseHelper = new DatabaseHelper(ctx);
     }
 
-    public long insertWord(String word, String uri) {
+    public Uri insertWord(String word, String uri) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(TOKENWORDS_WORD, word);
         contentValues.put(TOKENWORDS_URI, uri);
-        return databaseHelper.
+        long rowId = databaseHelper.
                 getWritableDatabase().
                 insert(TOKENWORDS_TABLENAME, null, contentValues);
+        return ContentUris.withAppendedId(Uri.parse(uri), rowId);
     }
 
     public String getUri(String word) {

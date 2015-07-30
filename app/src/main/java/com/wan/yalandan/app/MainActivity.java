@@ -24,11 +24,10 @@ public class MainActivity extends Activity {
         final EditText editTextAdd = (EditText) findViewById(R.id.editTextAddRow);
         final EditText editTextSearch = (EditText) findViewById(R.id.editTextSearch);
 
-        DatabaseAdaptor dbAdaptor = new DatabaseAdaptor(getBaseContext());
+        DatabaseAdapter dbAdaptor = new DatabaseAdapter(getBaseContext());
         Button btn = (Button) findViewById(R.id.btnAnswer);
         Button btnAddRow = (Button) findViewById(R.id.btnAdd);
         Button btnSearch = (Button) findViewById(R.id.btnSearch);
-
         btnAddRow.setOnClickListener(v -> {
             String[] values = editTextAdd.getText().toString().split(",");
             dbAdaptor.insertWord(values[0], values[1]);
