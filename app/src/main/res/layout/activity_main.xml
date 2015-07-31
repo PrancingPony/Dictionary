@@ -55,31 +55,4 @@
             android:layout_height="wrap_content"
             android:text="Answer"
             android:id="@+id/btnAnswer" android:layout_alignParentBottom="true" android:layout_centerHorizontal="true"/>
-    <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/editTextAddRow"
-            android:layout_below="@+id/relativeLayout"
-            android:layout_marginTop="43dp"
-            android:width="250dp"/>
-    <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Add"
-            android:id="@+id/btnAdd"
-            android:layout_alignBottom="@+id/editTextAddRow"
-            android:layout_toRightOf="@+id/editTextAddRow"
-            android:layout_toEndOf="@+id/editTextAddRow"/>
-    <Button android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Search"
-            android:id="@+id/btnSearch"
-            android:layout_below="@+id/btnAdd" android:layout_alignLeft="@+id/btnAdd"
-            android:layout_alignStart="@+id/btnSearch"/>
-    <EditText android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:id="@+id/editTextSearch"
-              android:width="250dp"
-              android:layout_alignBottom="@+id/btnSearch" android:layout_alignParentLeft="true"
-              android:layout_alignParentStart="true"/>
 </RelativeLayout>
