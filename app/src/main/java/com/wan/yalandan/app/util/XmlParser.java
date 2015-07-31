@@ -30,46 +30,6 @@ public class XmlParser {
     private final String TAG_IT = "it";
     private Context context=null;
 
-    public static String getLogTag() {
-        return LOG_TAG;
-    }
-
-    public String getTAG_HEADWORD() {
-        return TAG_HEADWORD;
-    }
-
-    public String getTAG_FUNCTIONAL_LABEL() {
-        return TAG_FUNCTIONAL_LABEL;
-    }
-
-    public String getTAG_MEANING_CORE() {
-        return TAG_MEANING_CORE;
-    }
-
-    public String getTAG_ILLUSTRATIVE_SENTENCE() {
-        return TAG_ILLUSTRATIVE_SENTENCE;
-    }
-
-    public String getTAG_SYNONYM() {
-        return TAG_SYNONYM;
-    }
-
-    public String getTAG_RELATED_WORDS() {
-        return TAG_RELATED_WORDS;
-    }
-
-    public String getTAG_ANTONYM() {
-        return TAG_ANTONYM;
-    }
-
-    public String getTAG_SENSE() {
-        return TAG_SENSE;
-    }
-
-    public String getTAG_IT() {
-        return TAG_IT;
-    }
-
     public XmlParser(Context context) {
         this.context=context;
     }
@@ -99,7 +59,6 @@ public class XmlParser {
         HashMap<String, String> hmWordFeature = new HashMap<>();
         List<String> tags = new ArrayList<>(2);
         String currentTag = null;
-        String previousTag = null;
 
         while (eventType != XmlPullParser.END_DOCUMENT) {
             switch (eventType) {
@@ -122,11 +81,13 @@ public class XmlParser {
 
                 case XmlPullParser.TEXT:
                     DetermineTagsGetContents(parser, currentTag, hmWordFeature, tags);
+                    break;
 
                 case XmlPullParser.END_TAG:
                     if (TAG_SENSE.equals(parser.getName())) {
                         return new Word(hmWordFeature.get(TAG_HEADWORD), hmWordFeature.get(TAG_FUNCTIONAL_LABEL), hmWordFeature.get(TAG_MEANING_CORE), hmWordFeature.get(TAG_ILLUSTRATIVE_SENTENCE), SplitTrimString(hmWordFeature.get(TAG_SYNONYM)), SplitTrimString(hmWordFeature.get(TAG_RELATED_WORDS)), SplitTrimString(hmWordFeature.get(TAG_ANTONYM)));
                     }
+                    break;
             }
             eventType = parser.next();
         }
