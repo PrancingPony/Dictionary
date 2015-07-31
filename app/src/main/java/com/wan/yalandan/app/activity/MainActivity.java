@@ -2,17 +2,14 @@ package com.wan.yalandan.app.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.wan.yalandan.app.R;
 import com.wan.yalandan.app.model.Word;
 import com.wan.yalandan.app.util.XmlParser;
 
-
 public class MainActivity extends Activity {
     private static final String LOG_TAG = "MainActivity";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +19,6 @@ public class MainActivity extends Activity {
         String s = "corresponding.xml";
         XmlParser parser = new XmlParser(getApplicationContext());
         Word word = parser.getWordData(s);
-        Log.d(LOG_TAG, "inComingWord:" + word.getHeadWord() + "FL: " + word.getFunctionalLabel() + "MC: " + word.getMeaningCore() + "V?: " + word.getIllustrativeSentence() + " REL:" + word.getRelatedWords() + "SYN:" + word.getSynonymList() + "ANT:" + word.getAntonyms());
     }
 
     @Override
