@@ -46,10 +46,10 @@ public class XmlParser {
 
         } catch (XmlPullParserException e) {
             //TODO : clarify log message
-            Log.e(LOG_TAG, "XmlPull cant provide stream", e);
+            Log.e(LOG_TAG, "xml pull cant provide stream", e);
         } catch (IOException e) {
             //TODO : clarify log message
-            Log.e(LOG_TAG, "?ts Technical Problem You Do Nothing, ?f you have good ass, try IOException", e);
+            Log.e(LOG_TAG, "wrong input,?o exception", e);
         }
         return null;
     }
@@ -81,9 +81,9 @@ public class XmlParser {
                                 tagTextMap.get(TAG_FUNCTIONAL_LABEL),
                                 tagTextMap.get(TAG_MEANING_CORE),
                                 tagTextMap.get(TAG_ILLUSTRATIVE_SENTENCE),
-                                SplitTrimString(tagTextMap.get(TAG_SYNONYM)),
-                                SplitTrimString(tagTextMap.get(TAG_RELATED_WORDS)),
-                                SplitTrimString(tagTextMap.get(TAG_ANTONYM)));
+                                splitTrimString(tagTextMap.get(TAG_SYNONYM)),
+                                splitTrimString(tagTextMap.get(TAG_RELATED_WORDS)),
+                                splitTrimString(tagTextMap.get(TAG_ANTONYM)));
                     }
                     break;
             }
@@ -118,7 +118,7 @@ public class XmlParser {
         }
     }
 
-    public List<String> SplitTrimString(String listString) {
+    public List<String> splitTrimString(String listString) {
         if (listString != null) {
             List<String> words = Arrays.asList(listString.split(","));
             List<String> trimmedWords = new ArrayList<>();
