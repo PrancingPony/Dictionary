@@ -8,9 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Created by abdulkadir.karabas on 27.07.2015.
- */
 public class DictionaryReader {
     private final static String LOG_TAG = DictionaryReader.class.getCanonicalName();
     public List<String> wordList;

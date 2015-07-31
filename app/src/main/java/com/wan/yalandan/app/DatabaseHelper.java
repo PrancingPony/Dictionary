@@ -5,16 +5,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-/**
- * Created by abdulkadir.karabas on 28.07.2015.
- */
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "DictionaryDb";
-    public static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + DatabaseAdaptor.TOKENWORDS_TABLENAME + "(" +
-            DatabaseAdaptor.TOKENWORDS_ID + "   INTEGER     PRIMARY KEY AUTOINCREMENT," +
-            DatabaseAdaptor.TOKENWORDS_WORD + " CHAR(50)    NOT NULL," +
-            DatabaseAdaptor.TOKENWORDS_URI + "  CHAR(256)   NOT NULL)";
+    public static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + DatabaseAdapter.TOKENWORDS_TABLENAME + "(" +
+            DatabaseAdapter.TOKENWORDS_ID + "   INTEGER     PRIMARY KEY AUTOINCREMENT," +
+            DatabaseAdapter.TOKENWORDS_WORD + " CHAR(50)    NOT NULL," +
+            DatabaseAdapter.TOKENWORDS_URI + "  CHAR(256)   NOT NULL)";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -30,7 +27,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.w(DatabaseHelper.class.getName(),
                 "Upgrading database from version " + oldVersion + " to "
                         + newVersion + ", which will destroy all old data");
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DatabaseAdaptor.TOKENWORDS_TABLENAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DatabaseAdapter.TOKENWORDS_TABLENAME);
         onCreate(sqLiteDatabase);
     }
 
