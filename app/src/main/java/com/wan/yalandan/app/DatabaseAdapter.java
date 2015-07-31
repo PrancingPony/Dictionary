@@ -6,6 +6,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DatabaseAdapter {
     private static final String LOG_TAG = "DATABASE";
     private static DatabaseHelper databaseHelper;
@@ -28,7 +31,7 @@ public class DatabaseAdapter {
         return ContentUris.withAppendedId(Uri.parse(uri), rowId);
     }
 
-    public String getUri(String word) {
+    public List<Uri> getUri(String word) {
         Cursor query = databaseHelper.
                 getReadableDatabase().
                 query(TOKENWORDS_TABLENAME,
@@ -38,6 +41,15 @@ public class DatabaseAdapter {
                         null,
                         null,
                         TOKENWORDS_ID);
-        return query.moveToLast() ? query.getString(2) : "";
+        if (query.moveToFirst()) {
+            List<Uri> uris = new ArrayList<>(query.getCount());
+            do {
+                uris.add(ContentUris.withAppendedId(Uri.parse(query.getString(query.getColumnIndex(TOKENWORDS_URI))), query.getInt(query.getColumnIndex(TOKENWORDS_ID))));
+            } while (query.moveToNext());
+            return uris;
+        }
+        return null;
     }
+
 }
+
