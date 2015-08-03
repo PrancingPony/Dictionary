@@ -40,11 +40,11 @@ public class DictionaryReader {
         }
     }
 
-    public List<String> get4RandomWords() {
+    public List<String> getRandomWords(int count) {
         List<String> randomWords = new ArrayList<>(4);
         Random rnd = new Random();
         int size = wordList.size();
-        while (randomWords.size() < 4) {
+        while (randomWords.size() < count) {
             int a = Math.abs(rnd.nextInt() % size);
             if (!randomWords.contains(wordList.get(a)))
                 randomWords.add(wordList.get(a));

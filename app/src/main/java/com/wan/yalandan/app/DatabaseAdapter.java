@@ -8,7 +8,7 @@ import android.net.Uri;
 
 public class DatabaseAdapter {
     public static final String TOKENWORDS_TABLENAME = "TakenWords";
-    public static final String TOKENWORDS_ID = "Id";
+    public static final String TOKENWORDS_ID = "_id";
     public static final String TOKENWORDS_WORD = "Word";
     public static final String TOKENWORDS_URI = "Uri";
     private static final String LOG_TAG = "DATABASE";
