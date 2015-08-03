@@ -6,12 +6,14 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "DictionaryDb";
     public static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + DatabaseAdapter.TOKENWORDS_TABLENAME + "(" +
             DatabaseAdapter.TOKENWORDS_ID + "   INTEGER     PRIMARY KEY AUTOINCREMENT," +
             DatabaseAdapter.TOKENWORDS_WORD + " CHAR(50)    NOT NULL," +
-            DatabaseAdapter.TOKENWORDS_URI + "  CHAR(256)   NOT NULL)";
+            DatabaseAdapter.TOKENWORDS_URI + "  CHAR(256)   NOT NULL," +
+            DatabaseAdapter.TOKENWORDS_DATE + " DATE        NOT NULL," +
+            DatabaseAdapter.TOKENWORDS_LISTNUMBER + "  INTEGER     NOT NULL)";
+    private static final int DATABASE_VERSION = 1;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
