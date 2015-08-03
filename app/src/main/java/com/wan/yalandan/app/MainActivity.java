@@ -1,6 +1,7 @@
 package com.wan.yalandan.app;
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,16 +23,22 @@ public class MainActivity extends Activity {
         DatabaseAdapter dbAdapter = new DatabaseAdapter(getBaseContext());
         DictionaryReader dr = new DictionaryReader(R.raw.american_english, getBaseContext());
         DownloadFileProcess.createFolder(getApplicationInfo().dataDir, "xmls");
+
+        dfp = new DownloadFileProcess(uri -> {
+            Log.d("CALLED URI", uri);
+        }, getBaseContext()
+        );
+
         btnAnswer = (Button) findViewById(R.id.btnAnswer);
 
-        this.btnAnswer.setOnClickListener(v -> {
-            dfp = new DownloadFileProcess(uri -> Log.d("CALLED URI", uri), getBaseContext());
-            dfp.getWordUriFromApi("flower");
+        btnAnswer.setOnClickListener(v -> {
+
+            dfp.getWordUriFromApi("hi");
 
         });
         //----TEST CODE------------
         final TextView tv = (TextView) findViewById(R.id.textView);
-
+//
 
 //        btnAnswer.setOnClickListener(v -> {
 //
