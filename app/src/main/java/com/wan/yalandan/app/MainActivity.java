@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.IOException;
+
 public class MainActivity extends Activity {
 
     Button btnAnswer;
@@ -21,11 +23,10 @@ public class MainActivity extends Activity {
         DictionaryReader dr = new DictionaryReader(R.raw.american_english, getBaseContext());
         DownloadFileProcess.createFolder(getApplicationInfo().dataDir, "xmls");
         btnAnswer = (Button) findViewById(R.id.btnAnswer);
-        final DownloadFileProcess.ICallbackUri downloadFinishedCallback = uri -> Log.d("CALLED URI", uri);
 
         this.btnAnswer.setOnClickListener(v -> {
-            dfp = new DownloadFileProcess(downloadFinishedCallback, getBaseContext());
-            dfp.getWordUriFromApi("book");
+            dfp = new DownloadFileProcess(uri -> Log.d("CALLED URI", uri), getBaseContext());
+            dfp.getWordUriFromApi("flower");
 
         });
         //----TEST CODE------------
@@ -43,8 +44,6 @@ public class MainActivity extends Activity {
 //        });
         //----TEST END-------------
     }
-
-
 
     @Override
     protected void onDestroy() {

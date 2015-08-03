@@ -19,6 +19,7 @@ import java.util.UUID;
 public class DownloadFileProcess {
 
     Context ctx;
+    DatabaseAdapter dbAdapter;
     private long enqueue;
     private DownloadManager dm;
     private ICallbackUri callback;
@@ -50,18 +51,26 @@ public class DownloadFileProcess {
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     public void getWordUriFromApi(String word) {
-        // TODO : Check first if it is in DB else { below codes will run
-        String filename = String.valueOf(UUID.randomUUID());
-        dm = (DownloadManager) ctx.getSystemService(Context.DOWNLOAD_SERVICE);
 
-        Resources resources = ctx.getResources();
-        String fqdnDictionary = String.format("%s?key=%s&word=%s", resources.getString(R.string.DictionarySite), resources.getString(R.string.KeyParam), word);
+        if (dbAdapter == null)
+            dbAdapter = new DatabaseAdapter(ctx);
+        Cursor c = dbAdapter.getUri(word);
+        if (c.moveToFirst()) {
+            callback.callback(c.getString(c.getColumnIndex(DatabaseAdapter.TOKENWORDS_URI)));
+        }
+        else {
+            String filename = String.valueOf(UUID.randomUUID());
+            dm = (DownloadManager) ctx.getSystemService(Context.DOWNLOAD_SERVICE);
 
-        DownloadManager.Request request = new
-                DownloadManager.Request(Uri.parse(fqdnDictionary));
+            Resources resources = ctx.getResources();
+            String fqdnDictionary = String.format("%s?key=%s&word=%s", resources.getString(R.string.DictionarySite), resources.getString(R.string.KeyParam), word);
 
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOCUMENTS, filename);
-        enqueue = dm.enqueue(request);
+            DownloadManager.Request request = new
+                    DownloadManager.Request(Uri.parse(fqdnDictionary));
+
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOCUMENTS, filename);
+            enqueue = dm.enqueue(request);
+        }
     }
 
     public void createFileAndAddData(String path, String fileName, String data) {
@@ -128,6 +137,7 @@ public class DownloadFileProcess {
                     int columnIndex = c.getColumnIndex(DownloadManager.COLUMN_STATUS);
                     if (DownloadManager.STATUS_SUCCESSFUL == c.getInt(columnIndex)) {
                         String uriString = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+
                         String absolutePath = uriString.replace("file://", "");
                         String xmlsFilesPath = ctx.getApplicationInfo().dataDir + "/xmls";
                         String[] seperateToPath = uriString.split("/");
@@ -135,8 +145,19 @@ public class DownloadFileProcess {
                         try {
                             String XmlContent = readFile(absolutePath);
                             createFileAndAddData(xmlsFilesPath, fileName, XmlContent);
-                            // TODO: Insert word to database
-                            callback.callback(xmlsFilesPath + "/" + fileName);
+
+                            String fqdnDictionary = c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI));
+                            String[] seperateTofqdnDictionary = fqdnDictionary.split("=");
+
+                            String currentWord = seperateTofqdnDictionary[seperateTofqdnDictionary.length - 1];
+                            String currentUri = xmlsFilesPath + "/" + fileName;
+
+                            if (dbAdapter == null)
+                                dbAdapter = new DatabaseAdapter(ctx);
+
+                            dbAdapter.insertWord(currentWord, currentUri);
+
+                            callback.callback(currentUri);
                         } catch (IOException e) {
                             Log.e("readFile Error", "There is an error about IO Exception", e);
                         }
