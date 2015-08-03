@@ -41,7 +41,7 @@ public class DictionaryReader {
     }
 
     public List<String> getRandomWords(int count) {
-        List<String> randomWords = new ArrayList<>(4);
+        List<String> randomWords = new ArrayList<>(count);
         Random rnd = new Random();
         int size = wordList.size();
         while (randomWords.size() < count) {
