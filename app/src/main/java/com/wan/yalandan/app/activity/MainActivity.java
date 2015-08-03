@@ -3,7 +3,6 @@ package com.wan.yalandan.app.activity;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.TextView;
@@ -55,13 +54,9 @@ public class MainActivity extends Activity {
                         uriList.add(uri);
                         if (uriList.size() == 4) {
                             for (RadioButton radioButton : radioButtons) {
-                                // TODO : process uris
-                                String s = "corresponding.xml";
+
                                 XmlParser parser = new XmlParser(getApplicationContext());
-
                                 Word wordModel = parser.getWordData(uriList.get(radioButtons.indexOf(radioButton)).toString());
-
-                                Log.d(LOG_TAG, "word Model" + wordModel.getMeaningCore());
                                 radioButton.setText(wordModel.getMeaningCore());
                             }
                         }
