@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="DictionarySite">http://www.dictionaryapi.com/api/v1/references/thesaurus/xml/test</string>
+    <string name="KeyParam">19cb0d77-2780-4cb1-8015-207cc06d9913</string>
+</resources>
