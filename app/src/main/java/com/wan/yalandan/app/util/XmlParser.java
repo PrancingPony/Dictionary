@@ -7,6 +7,8 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -36,10 +38,18 @@ public class XmlParser {
 
     public Word getWordData(String uri) {
         XmlPullParserFactory pullParserFactory;
+        InputStream inStream=null;
         try {
             pullParserFactory = XmlPullParserFactory.newInstance();
             XmlPullParser parser = pullParserFactory.newPullParser();
-            InputStream inStream = context.getAssets().open(uri);
+            Log.d(LOG_TAG, "Uri:" + uri);
+
+           File file = new File(uri);
+           inStream= new FileInputStream(file);
+
+            //  File file=context.getFileStreamPath(uri);
+            //  inStream=new FileInputStream(file);
+            Log.d(LOG_TAG, "instreambitti:");
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(inStream, null);
             return parseXML(parser);
@@ -50,6 +60,15 @@ public class XmlParser {
         } catch (IOException e) {
             //TODO : clarify log message
             Log.e(LOG_TAG, "wrong input,?o exception", e);
+        } finally {
+            if(inStream!=null){
+                try {
+                    inStream.close();
+                } catch (IOException e) {
+                  Log.e(LOG_TAG,"when stream openning occured error"+  e);
+                }
+            }
+
         }
         return null;
     }

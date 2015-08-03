@@ -3,12 +3,16 @@ package com.wan.yalandan.app.activity;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
-import com.wan.yalandan.app.R;
-import com.wan.yalandan.app.model.Word;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import com.wan.yalandan.app.DictionaryReader;
+import com.wan.yalandan.app.DownloadFileProcess;
+import com.wan.yalandan.app.R;
+import com.wan.yalandan.app.model.Word;
 import com.wan.yalandan.app.util.XmlParser;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -30,10 +34,7 @@ public class MainActivity extends Activity {
         final Button btnAnswer = (Button) findViewById(R.id.btnAnswer);
         final TextView tv = (TextView) findViewById(R.id.textView);
 
-        String s = "corresponding.xml";
-        XmlParser parser = new XmlParser(getApplicationContext());
-        Word word = parser.getWordData(s);
-    }
+
         //-----------------------------
         radioButtons.add((RadioButton) findViewById(R.id.radioButton));
         radioButtons.add((RadioButton) findViewById(R.id.radioButton2));
@@ -52,9 +53,16 @@ public class MainActivity extends Activity {
             dfp = new DownloadFileProcess(
                     uri -> {
                         uriList.add(uri);
-                        if(uriList.size()==4) {
+                        if (uriList.size() == 4) {
                             for (RadioButton radioButton : radioButtons) {
-                                radioButton.setText(uriList.get(radioButtons.indexOf(radioButton)).toString());
+                                // TODO : process uris
+                                String s = "corresponding.xml";
+                                XmlParser parser = new XmlParser(getApplicationContext());
+
+                                Word wordModel = parser.getWordData(uriList.get(radioButtons.indexOf(radioButton)).toString());
+
+                                Log.d(LOG_TAG, "word Model" + wordModel.getMeaningCore());
+                                radioButton.setText(wordModel.getMeaningCore());
                             }
                         }
                         Log.d("URILIST", String.valueOf(uriList.size()));
@@ -68,6 +76,7 @@ public class MainActivity extends Activity {
 
         //----TEST END-------------
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

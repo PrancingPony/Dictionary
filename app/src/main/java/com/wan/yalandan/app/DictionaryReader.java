@@ -12,7 +12,7 @@ public class DictionaryReader {
     private final static String LOG_TAG = DictionaryReader.class.getCanonicalName();
     public List<String> wordList;
 
-    DictionaryReader(int resourcesId, Context ctx) {
+    public DictionaryReader(int resourcesId, Context ctx) {
         try {
             getWords(ctx, resourcesId);
         } catch (FileNotFoundException e) {
