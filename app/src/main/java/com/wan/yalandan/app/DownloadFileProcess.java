@@ -49,9 +49,7 @@ public class DownloadFileProcess {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     public void getWordUriFromApi(String word) {
-
         if (dbAdapter == null)
             dbAdapter = new DatabaseAdapter(ctx);
         Cursor c = dbAdapter.getUri(word);
@@ -68,7 +66,7 @@ public class DownloadFileProcess {
             DownloadManager.Request request = new
                     DownloadManager.Request(Uri.parse(fqdnDictionary));
 
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOCUMENTS, filename);
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
             enqueue = dm.enqueue(request);
         }
     }
@@ -128,7 +126,8 @@ public class DownloadFileProcess {
         }
 
         @Override
-        public void onReceive(Context context, Intent intent) {
+        public void onReceive(Context context, Intent intent)
+        {
             if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(intent.getAction())) {
                 DownloadManager.Query query = new DownloadManager.Query();
                 query.setFilterById(enqueue);
