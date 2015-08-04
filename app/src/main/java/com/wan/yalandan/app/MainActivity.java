@@ -3,9 +3,8 @@ package com.wan.yalandan.app;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Button;
-import android.widget.RadioButton;
-import android.widget.TextView;
+import android.view.View;
+import android.widget.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,13 +12,11 @@ import java.util.Random;
 
 public class MainActivity extends Activity {
 
-    Button btnAnswer;
-    TextView tv;
-    DownloadFileProcess dfp;
-
     static List<RadioButton> radioButtons = new ArrayList<>(4);
     static ArrayList<Object> uriList = new ArrayList<>(4);
-
+    ImageButton btnAnswer;
+    TextView tv;
+    DownloadFileProcess dfp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +59,7 @@ public class MainActivity extends Activity {
     }
 
     public void init() {
-        btnAnswer = (Button) findViewById(R.id.btnAnswer);
+        btnAnswer = (ImageButton) findViewById(R.id.btnAnswer);
         tv = (TextView) findViewById(R.id.textView);
 
         radioButtons.add((RadioButton) findViewById(R.id.radioButton));

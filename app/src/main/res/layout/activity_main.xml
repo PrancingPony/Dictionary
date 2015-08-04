@@ -55,16 +55,17 @@
             </RadioGroup>
         </LinearLayout>
     </RelativeLayout>
-    <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Answer"
-            android:id="@+id/btnAnswer" android:layout_alignParentBottom="true" android:layout_centerHorizontal="true"/><![CDATA[
-    Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="DownMan. Test"
-            android:id="@+id/btnDMTest"
-            android:layout_above="@+id/btnAnswer" android:layout_centerHorizontal="true"/>
-    ]]>
+       <ImageButton
+            android:id="@+id/btnAnswer"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="10dp"
+            android:elevation="1dp"
+            android:stateListAnimator="@anim/button_elevation"
+            android:tint="@android:color/white"
+            android:background="@drawable/oval_ripple"
+            android:src="@android:drawable/ic_input_add"/>
 </RelativeLayout>
