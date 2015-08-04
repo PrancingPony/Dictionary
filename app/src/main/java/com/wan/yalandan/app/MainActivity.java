@@ -3,7 +3,9 @@ package com.wan.yalandan.app;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
@@ -19,39 +21,61 @@ public class MainActivity extends Activity {
 
     static List<RadioButton> radioButtons = new ArrayList<>(4);
     static ArrayList<Object> uriList = new ArrayList<>(4);
-
+    static ProgressBar progressBar;
+    static long currenttime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
-
-        DictionaryReader dr = new DictionaryReader(R.raw.american_english, getBaseContext());
+        final DictionaryReader dr = new DictionaryReader(R.raw.american_english, getBaseContext());
         DownloadFileProcess.createFolder(getApplicationInfo().dataDir, "xmls");
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
-        List<String> randomWords = dr.getRandomWords(4);
+        final List[] randomWords = new List[]{dr.getRandomWords(4)};
         Random random = new Random();
-        int wordNum = random.nextInt() % 4;
-        randomWords = dr.getRandomWords(4);
-        final List<String> finalRandomWords = randomWords;
+        int wordNum = Math.abs(random.nextInt() % 4);
+        randomWords[0] = dr.getRandomWords(4);
 
         dfp = new DownloadFileProcess(uri -> {
-            Log.d("CALLED URI", uri);
+            btnAnswer.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
+            randomWords[0] = dr.getRandomWords(4);
+            tv.setText(randomWords[0].toString());
+            currenttime = System.currentTimeMillis();
+            for (Object word : randomWords[0]) {
             uriList.add(uri);
-            if (uriList.size() == 4) {
+                        if (uriList.size() == 4) {
                 for (RadioButton radioButton : radioButtons) {
                     radioButton.setText(uriList.get(radioButtons.indexOf(radioButton)).toString());
                 }
+                            tv.setText(randomWords[0].get(wordNum).toString());
+                            uriList.clear();
+                            progressBar.setVisibility(View.INVISIBLE);
+                            btnAnswer.setVisibility(View.VISIBLE);
             }
         }, getBaseContext()
         );
 
         btnAnswer.setOnClickListener(v -> {
             uriList.clear();
-            for (String word : finalRandomWords) {
-                dfp.getWordUriFromApi(word);
+                dfp.getWordUriFromApi((String) word);
             }
+            new Thread(() -> {
+                while (System.currentTimeMillis() - currenttime < 5000) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                this.runOnUiThread(() -> {
+                    uriList.clear();
+                    btnAnswer.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.INVISIBLE);
+                });
+            }).start();
         });
     }
 

@@ -67,4 +67,11 @@
             android:id="@+id/btnDMTest"
             android:layout_above="@+id/btnAnswer" android:layout_centerHorizontal="true"/>
     ]]>
+    <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:id="@+id/progressBar"
+            android:layout_alignParentBottom="true" android:layout_alignLeft="@+id/btnAnswer"
+            android:layout_alignStart="@+id/btnAnswer"
+            android:layout_alignRight="@+id/btnAnswer" android:layout_alignEnd="@+id/btnAnswer"
+            android:visibility="invisible" android:layout_alignTop="@+id/btnAnswer"/>
 </RelativeLayout>
