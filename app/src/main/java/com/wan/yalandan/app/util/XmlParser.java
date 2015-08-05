@@ -21,15 +21,17 @@ import java.util.List;
  */
 public class XmlParser {
     private static final String LOG_TAG = XmlParser.class.getCanonicalName();
-    private final String TAG_HEADWORD = "hw";
-    private final String TAG_FUNCTIONAL_LABEL = "fl";
-    private final String TAG_MEANING_CORE = "mc";
-    private final String TAG_ILLUSTRATIVE_SENTENCE = "vi";
-    private final String TAG_SYNONYM = "syn";
-    private final String TAG_RELATED_WORDS = "rel";
-    private final String TAG_ANTONYM = "ant";
-    private final String TAG_SENSE = "sens";
-    private final String TAG_IT = "it";
+    private static final String TAG_HEADWORD = "hw";
+    private static final String TAG_FUNCTIONAL_LABEL = "fl";
+    private static final String TAG_MEANING_CORE = "mc";
+    private static final String TAG_ILLUSTRATIVE_SENTENCE = "vi";
+    private static final String TAG_SYNONYM = "syn";
+    private static final String TAG_RELATED_WORDS = "rel";
+    private static final String TAG_ANTONYM = "ant";
+    private static final String TAG_SENSE = "sens";
+    private static final String TAG_IT = "it";
+    private static final String TAG_ENTRY = "entry";
+
     private Context context = null;
 
     public XmlParser(Context context) {
@@ -58,6 +60,7 @@ public class XmlParser {
             if (inStream != null) {
                 try {
                     inStream.close();
+
                 } catch (IOException e) {
                     Log.e(LOG_TAG, "when stream openning occured error" + e);
                 }
@@ -89,7 +92,7 @@ public class XmlParser {
                     determineTagsAndGetContents(parser, currentTag, tagTextMap);
                     break;
                 case XmlPullParser.END_TAG:
-                    if (TAG_SENSE.equals(parser.getName())) {
+                    if (TAG_SENSE.equals(parser.getName()) || TAG_ENTRY.equals(parser.getName())) {
                         return new Word(tagTextMap.get(TAG_HEADWORD),
                                 tagTextMap.get(TAG_FUNCTIONAL_LABEL),
                                 tagTextMap.get(TAG_MEANING_CORE),

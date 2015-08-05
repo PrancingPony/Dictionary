@@ -1,6 +1,5 @@
 package com.wan.yalandan.app;
 
-import android.annotation.TargetApi;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -9,15 +8,18 @@ import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
+import com.wan.yalandan.app.activity.MainActivity;
 
 import java.io.*;
 import java.util.UUID;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class DownloadFileProcess {
 
+    public static final Lock lock = new ReentrantLock();
     Context ctx;
     DatabaseAdapter dbAdapter;
     private long enqueue;
@@ -55,8 +57,8 @@ public class DownloadFileProcess {
         Cursor c = dbAdapter.getUri(word);
         if (c.moveToFirst()) {
             callback.callback(c.getString(c.getColumnIndex(DatabaseAdapter.TOKENWORDS_URI)));
-        }
-        else {
+            c.close();
+        } else {
             String filename = String.valueOf(UUID.randomUUID());
             dm = (DownloadManager) ctx.getSystemService(Context.DOWNLOAD_SERVICE);
 
@@ -91,7 +93,7 @@ public class DownloadFileProcess {
 
     public String readFile(String pathAndFileName) throws IOException {
 
-        Log.d("FILEPATH", pathAndFileName);
+        //Log.d("FILEPATH", pathAndFileName);
         File file = new File(pathAndFileName);
         FileReader fileReader = new FileReader(file);
         BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -126,8 +128,8 @@ public class DownloadFileProcess {
         }
 
         @Override
-        public void onReceive(Context context, Intent intent)
-        {
+        public void onReceive(Context context, Intent intent) {
+            if(MainActivity.isDone)return;
             if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(intent.getAction())) {
                 DownloadManager.Query query = new DownloadManager.Query();
                 query.setFilterById(enqueue);
@@ -141,24 +143,31 @@ public class DownloadFileProcess {
                         String xmlsFilesPath = ctx.getApplicationInfo().dataDir + "/xmls";
                         String[] seperateToPath = uriString.split("/");
                         String fileName = seperateToPath[seperateToPath.length - 1];
+                        String currentUri = null;
                         try {
                             String XmlContent = readFile(absolutePath);
                             createFileAndAddData(xmlsFilesPath, fileName, XmlContent);
 
                             String fqdnDictionary = c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI));
+
                             String[] seperateTofqdnDictionary = fqdnDictionary.split("=");
 
                             String currentWord = seperateTofqdnDictionary[seperateTofqdnDictionary.length - 1];
-                            String currentUri = xmlsFilesPath + "/" + fileName;
+                            currentUri = xmlsFilesPath + "/" + fileName;
 
                             if (dbAdapter == null)
                                 dbAdapter = new DatabaseAdapter(ctx);
 
                             dbAdapter.insertWord(currentWord, currentUri);
 
+                            Log.d("URI ", currentWord + " > " + currentUri);
                             callback.callback(currentUri);
+
                         } catch (IOException e) {
                             Log.e("readFile Error", "There is an error about IO Exception", e);
+                        } finally {
+                            c.close();
+                            ctx.unregisterReceiver(receiver);
                         }
                     }
                 }
