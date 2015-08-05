@@ -59,49 +59,29 @@ public class DownloadFileProcess {
             c.close();
         } else {
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(dictionaryApiURL + word));
-
             String filename = String.valueOf(UUID.randomUUID());
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
             queuedTaskId = downloadManager.enqueue(request);
         }
     }
 
-    public void createFileAndAddData(String path, String fileName, String data) {
+    public void copyFile(File src, File dst) throws IOException {
+        InputStream in = new FileInputStream(src);
+        OutputStream out = new FileOutputStream(dst);
 
-        File file = new File(path, fileName);
-        FileOutputStream fos;
-
-        byte[] buffer = data.getBytes();
-        try {
-            fos = new FileOutputStream(file);
-            fos.write(buffer);
-            fos.flush();
-            fos.close();
-        } catch (FileNotFoundException e) {
-            Log.e("file_Create Method", "File not found", e);
-        } catch (IOException e) {
-            Log.e("file_Create Method", "There is an exception in file_Create Method", e);
+        // Transfer bytes from in to out
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
         }
-    }
-
-    public String readFile(String pathAndFileName) throws IOException {
-        File file = new File(pathAndFileName);
-        FileReader fileReader = new FileReader(file);
-        BufferedReader bufferedReader = new BufferedReader(fileReader);
-        String read;
-        StringBuilder builder = new StringBuilder("");
-
-        while ((read = bufferedReader.readLine()) != null) {
-            builder.append(read);
-        }
-        bufferedReader.close();
-        fileReader.close();
-
-        return builder.toString();
+        in.close();
+        out.close();
     }
 
     public interface ICallbackUri {
         void onSuccess(String uri);
+        void onFail(String word);
     }
 
     private class DownloadStatusReceiver extends BroadcastReceiver {
@@ -115,39 +95,43 @@ public class DownloadFileProcess {
                 if (c.moveToFirst()) {
                     int columnIndex = c.getColumnIndex(DownloadManager.COLUMN_STATUS);
                     Log.d("TEST", "Download result: " + c.getInt(columnIndex));
-                    // TODO : handle more states
-                    if (DownloadManager.STATUS_SUCCESSFUL == c.getInt(columnIndex)) {
-                        String uriString = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
 
-                        String absolutePath = uriString.replace("file://", "");
-                        String xmlsFilesPath = context.getApplicationInfo().dataDir + "/xmls";
-                        String[] seperateToPath = uriString.split("/");
-                        String fileName = seperateToPath[seperateToPath.length - 1];
-                        String currentUri;
-                        try {
-                            // TODO : transfer file instead reading the data inside and recreate
-                            String XmlContent = readFile(absolutePath);
-                            createFileAndAddData(xmlsFilesPath, fileName, XmlContent);
+                    String fqdnDictionary = c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI));
+                    String[] seperateTofqdnDictionary = fqdnDictionary.split("=");
+                    String currentWord = seperateTofqdnDictionary[seperateTofqdnDictionary.length - 1];
 
-                            String fqdnDictionary = c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI));
+                    switch (c.getInt(columnIndex)) {
+                        case DownloadManager.STATUS_SUCCESSFUL:
+                            String uriString = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+                            String[] seperateToPath = uriString.split("/");
+                            String fileName = seperateToPath[seperateToPath.length - 1];
 
-                            String[] seperateTofqdnDictionary = fqdnDictionary.split("=");
+                            try {
+                                String absolutePath = uriString.replace("file://", "");
+                                String xmlsFilesPath = context.getApplicationInfo().dataDir + "/xmls";
 
-                            String currentWord = seperateTofqdnDictionary[seperateTofqdnDictionary.length - 1];
-                            currentUri = xmlsFilesPath + "/" + fileName;
+                                File sourceFile = new File(absolutePath);
+                                File destinationFile = new File(xmlsFilesPath, fileName);
+                                copyFile(sourceFile, destinationFile);
 
-                            if (dbInstance == null)
-                                dbInstance = new DataStore(context);
+                                String currentUri = xmlsFilesPath + "/" + fileName;
 
-                            dbInstance.insertWord(currentWord, currentUri);
+                                if (dbInstance == null)
+                                    dbInstance = new DataStore(context);
 
-                            Log.d("URI ", currentWord + " > " + currentUri);
-                            successCallback.onSuccess(currentUri);
-                        } catch (IOException e) {
-                            Log.e("readFile Error", "There is an error about IO Exception", e);
-                        } finally {
-                            c.close();
-                        }
+                                dbInstance.insertWord(currentWord, currentUri);
+
+                                Log.d("URI ", currentWord + " > " + currentUri);
+                                successCallback.onSuccess(currentUri);
+                            } catch (IOException e) {
+                                Log.e("readFile Error", "There is an error about IO Exception", e);
+                            } finally {
+                                c.close();
+                            }
+                            break;
+                        default:
+                            successCallback.onFail(currentWord);
+                            break;
                     }
                 }
             }

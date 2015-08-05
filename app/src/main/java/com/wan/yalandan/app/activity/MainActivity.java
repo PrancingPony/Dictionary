@@ -2,6 +2,7 @@ package com.wan.yalandan.app.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -62,19 +63,28 @@ public class MainActivity extends Activity {
         parser = new XmlParser();
         DownloadFileProcess.createFolder(getApplicationInfo().dataDir, "xmls");
 
-        DownloadFileProcess.ICallbackUri fileDownloadedCallback = uri -> {
-            Word result = parser.getWordData(uri);
-            if (result == null) {
-                requestNewWord();
-            } else {
-                if (words.contains(result)) {
+        DownloadFileProcess.ICallbackUri fileDownloadedCallback = new DownloadFileProcess.ICallbackUri() {
+            @Override
+            public void onSuccess(String uri) {
+                Word result = parser.getWordData(uri);
+                if (result == null) {
                     requestNewWord();
                 } else {
-                    words.add(result);
-                    if (words.size() == NUMBER_OF_OPTIONS) {
-                        updateUI();
+                    if (words.contains(result)) {
+                        requestNewWord();
+                    } else {
+                        words.add(result);
+                        if (words.size() == NUMBER_OF_OPTIONS) {
+                            updateUI();
+                        }
                     }
                 }
+            }
+
+            @Override
+            public void onFail(String word)
+            {
+                Log.e("DownloadFailForWord",word);
             }
         };
 
