@@ -1,6 +1,5 @@
 package com.wan.yalandan.app.util;
 
-import android.content.Context;
 import android.util.Log;
 import com.wan.yalandan.app.model.Word;
 import org.xmlpull.v1.XmlPullParser;
@@ -16,9 +15,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * Created by emre.can on 7/30/2015.
- */
 public class XmlParser {
     private static final String LOG_TAG = XmlParser.class.getCanonicalName();
     private static final String TAG_HEADWORD = "hw";
@@ -32,10 +28,8 @@ public class XmlParser {
     private static final String TAG_IT = "it";
     private static final String TAG_ENTRY = "entry";
 
-    private Context context = null;
 
-    public XmlParser(Context context) {
-        this.context = context;
+    public XmlParser() {
     }
 
     public Word getWordData(String uri) {
@@ -49,7 +43,6 @@ public class XmlParser {
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(inStream, null);
             return parseXML(parser);
-
         } catch (XmlPullParserException e) {
             //TODO : clarify log message
             Log.e(LOG_TAG, "xml pull cant provide stream", e);
@@ -60,7 +53,6 @@ public class XmlParser {
             if (inStream != null) {
                 try {
                     inStream.close();
-
                 } catch (IOException e) {
                     Log.e(LOG_TAG, "when stream openning occured error" + e);
                 }

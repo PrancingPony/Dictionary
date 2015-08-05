@@ -1,4 +1,4 @@
-package com.wan.yalandan.app;
+package com.wan.yalandan.app.data;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -6,8 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
-public class DatabaseAdapter {
-
+public class DataStore {
 
     public static final String TOKENWORDS_TABLENAME = "TakenWords";
     public static final String TOKENWORDS_ID = "_id";
@@ -19,7 +18,7 @@ public class DatabaseAdapter {
     private static final String LOG_TAG = "DATABASE";
     private static DatabaseHelper databaseHelper;
 
-    public DatabaseAdapter(Context ctx) {
+    public DataStore(Context ctx) {
         databaseHelper = new DatabaseHelper(ctx);
     }
 
@@ -27,7 +26,7 @@ public class DatabaseAdapter {
         ContentValues contentValues = new ContentValues();
         contentValues.put(TOKENWORDS_WORD, word);
         contentValues.put(TOKENWORDS_URI, uri);
-        contentValues.put(TOKENWORDS_DATE, System.currentTimeMillis()/1000);
+        contentValues.put(TOKENWORDS_DATE, System.currentTimeMillis() / 1000);
         contentValues.put(TOKENWORDS_LISTNUMBER, ListName.GENERAL.getId());
         long rowId = databaseHelper.
                 getWritableDatabase().
@@ -39,7 +38,7 @@ public class DatabaseAdapter {
         return databaseHelper.
                 getReadableDatabase().
                 query(TOKENWORDS_TABLENAME,
-                        new String[]{TOKENWORDS_ID, TOKENWORDS_WORD, TOKENWORDS_URI,TOKENWORDS_DATE,TOKENWORDS_LISTNUMBER},
+                        new String[]{TOKENWORDS_ID, TOKENWORDS_WORD, TOKENWORDS_URI, TOKENWORDS_DATE, TOKENWORDS_LISTNUMBER},
                         TOKENWORDS_WORD + "=?",
                         new String[]{word},
                         null,

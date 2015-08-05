@@ -1,4 +1,4 @@
-package com.wan.yalandan.app;
+package com.wan.yalandan.app.util;
 
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
@@ -10,37 +10,38 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
-import com.wan.yalandan.app.activity.MainActivity;
+import com.wan.yalandan.app.R;
+import com.wan.yalandan.app.data.DataStore;
 
 import java.io.*;
 import java.util.UUID;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class DownloadFileProcess {
 
-    public static final Lock lock = new ReentrantLock();
-    Context ctx;
-    DatabaseAdapter dbAdapter;
-    private long enqueue;
-    private DownloadManager dm;
-    private ICallbackUri callback;
+    private final String dictionaryApiURL;
+    private long queuedTaskId;
+    private Context context;
+    private DataStore dbInstance;
+    private DownloadManager downloadManager;
+    private ICallbackUri successCallback;
     private DownloadStatusReceiver receiver;
 
-    public DownloadFileProcess(ICallbackUri _callback, Context _ctx) {
-        ctx = _ctx;
-        callback = _callback;
-        receiver = new DownloadStatusReceiver(_ctx);
-        // FIXME : Make broadcast receiver global
-        ctx.registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+    public DownloadFileProcess(ICallbackUri _callback, Context _context) {
+        context = _context;
+        successCallback = _callback;
+        receiver = new DownloadStatusReceiver();
+        context.registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+        Resources resources = context.getResources();
+        dictionaryApiURL = String.format("%s?key=%s&word=", resources.getString(R.string.DictionarySite), resources.getString(R.string.KeyParam));
+        downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        dbInstance = new DataStore(context);
     }
 
     public static void createFolder(String path, String folderName) {
         File folder = new File(path + "/" + folderName);
 
         if (!folder.exists()) {
-            boolean success = false;
-            success = folder.mkdir();
+            boolean success = folder.mkdir();
             if (success) {
                 Log.v("Creating Folder Proces", "Folder was created");
             } else {
@@ -52,24 +53,16 @@ public class DownloadFileProcess {
     }
 
     public void getWordUriFromApi(String word) {
-        if (dbAdapter == null)
-            dbAdapter = new DatabaseAdapter(ctx);
-        Cursor c = dbAdapter.getUri(word);
+        Cursor c = dbInstance.getUri(word);
         if (c.moveToFirst()) {
-            callback.callback(c.getString(c.getColumnIndex(DatabaseAdapter.TOKENWORDS_URI)));
+            successCallback.onSuccess(c.getString(c.getColumnIndex(DataStore.TOKENWORDS_URI)));
             c.close();
         } else {
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(dictionaryApiURL + word));
+
             String filename = String.valueOf(UUID.randomUUID());
-            dm = (DownloadManager) ctx.getSystemService(Context.DOWNLOAD_SERVICE);
-
-            Resources resources = ctx.getResources();
-            String fqdnDictionary = String.format("%s?key=%s&word=%s", resources.getString(R.string.DictionarySite), resources.getString(R.string.KeyParam), word);
-
-            DownloadManager.Request request = new
-                    DownloadManager.Request(Uri.parse(fqdnDictionary));
-
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
-            enqueue = dm.enqueue(request);
+            queuedTaskId = downloadManager.enqueue(request);
         }
     }
 
@@ -92,8 +85,6 @@ public class DownloadFileProcess {
     }
 
     public String readFile(String pathAndFileName) throws IOException {
-
-        //Log.d("FILEPATH", pathAndFileName);
         File file = new File(pathAndFileName);
         FileReader fileReader = new FileReader(file);
         BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -106,45 +97,35 @@ public class DownloadFileProcess {
         bufferedReader.close();
         fileReader.close();
 
-
         return builder.toString();
     }
 
-    public void unregisterReceiver() {
-        receiver.unregisterReceiver();
-    }
-
     public interface ICallbackUri {
-        void callback(String uri);
+        void onSuccess(String uri);
     }
 
     private class DownloadStatusReceiver extends BroadcastReceiver {
 
-        private Context context;
-
-        public DownloadStatusReceiver(Context context) {
-            super();
-            this.context = context;
-        }
-
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(MainActivity.isDone)return;
             if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(intent.getAction())) {
                 DownloadManager.Query query = new DownloadManager.Query();
-                query.setFilterById(enqueue);
-                Cursor c = dm.query(query);
+                query.setFilterById(queuedTaskId);
+                Cursor c = downloadManager.query(query);
                 if (c.moveToFirst()) {
                     int columnIndex = c.getColumnIndex(DownloadManager.COLUMN_STATUS);
+                    Log.d("TEST", "Download result: " + c.getInt(columnIndex));
+                    // TODO : handle more states
                     if (DownloadManager.STATUS_SUCCESSFUL == c.getInt(columnIndex)) {
                         String uriString = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
 
                         String absolutePath = uriString.replace("file://", "");
-                        String xmlsFilesPath = ctx.getApplicationInfo().dataDir + "/xmls";
+                        String xmlsFilesPath = context.getApplicationInfo().dataDir + "/xmls";
                         String[] seperateToPath = uriString.split("/");
                         String fileName = seperateToPath[seperateToPath.length - 1];
-                        String currentUri = null;
+                        String currentUri;
                         try {
+                            // TODO : transfer file instead reading the data inside and recreate
                             String XmlContent = readFile(absolutePath);
                             createFileAndAddData(xmlsFilesPath, fileName, XmlContent);
 
@@ -155,19 +136,17 @@ public class DownloadFileProcess {
                             String currentWord = seperateTofqdnDictionary[seperateTofqdnDictionary.length - 1];
                             currentUri = xmlsFilesPath + "/" + fileName;
 
-                            if (dbAdapter == null)
-                                dbAdapter = new DatabaseAdapter(ctx);
+                            if (dbInstance == null)
+                                dbInstance = new DataStore(context);
 
-                            dbAdapter.insertWord(currentWord, currentUri);
+                            dbInstance.insertWord(currentWord, currentUri);
 
                             Log.d("URI ", currentWord + " > " + currentUri);
-                            callback.callback(currentUri);
-
+                            successCallback.onSuccess(currentUri);
                         } catch (IOException e) {
                             Log.e("readFile Error", "There is an error about IO Exception", e);
                         } finally {
                             c.close();
-                            ctx.unregisterReceiver(receiver);
                         }
                     }
                 }
@@ -175,7 +154,7 @@ public class DownloadFileProcess {
         }
 
         public void unregisterReceiver() {
-            ctx.unregisterReceiver(receiver);
+            context.unregisterReceiver(receiver);
         }
     }
 }

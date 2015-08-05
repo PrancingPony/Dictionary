@@ -1,4 +1,4 @@
-package com.wan.yalandan.app;
+package com.wan.yalandan.app.util;
 
 import android.content.Context;
 import android.util.Log;

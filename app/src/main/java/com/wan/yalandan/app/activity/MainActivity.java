@@ -2,13 +2,15 @@ package com.wan.yalandan.app.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.*;
-import com.wan.yalandan.app.DictionaryReader;
-import com.wan.yalandan.app.DownloadFileProcess;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.TextView;
 import com.wan.yalandan.app.R;
 import com.wan.yalandan.app.model.Word;
+import com.wan.yalandan.app.util.DictionaryReader;
+import com.wan.yalandan.app.util.DownloadFileProcess;
 import com.wan.yalandan.app.util.XmlParser;
 
 import java.util.ArrayList;
@@ -16,48 +18,17 @@ import java.util.List;
 import java.util.Random;
 
 public class MainActivity extends Activity {
-    static List<RadioButton> radioButtons = new ArrayList<>(4);
-    static ArrayList<Object> uriList = new ArrayList<>(4);
-    static List<String> randomWords = new ArrayList<>(4);
-    static int currentTrue;
-    static ProgressBar progressBar;
-    static Button btnAnswer;
-    public  static boolean isDone = false;
-    private static int requestCounter = 0;
-    private static int requestfinished = 0;
-    public DictionaryReader dr;
-    TextView tv;
+    private final static int NUMBER_OF_OPTIONS = 4;
 
-    public void request(String uri,String word) {
-        XmlParser parser = new XmlParser(getApplicationContext());
-        Word wordModel = parser.getWordData(uri);
-        if (wordModel == null && !isDone) {
-            requestCounter--;
-            getUri();
-        } else {
-            if(randomWords.contains(word))return;
-            uriList.add(uri);
-            randomWords.add(word);
-            requestCounter--;
-            requestfinished++;
-            Log.d("---------Word:-> ",word);
-
-            if (uriList.size() == 4) {
-                for (RadioButton radioButton : radioButtons) {
-                    parser = new XmlParser(getApplicationContext());
-                    wordModel = parser.getWordData(uriList.get(radioButtons.indexOf(radioButton)).toString());
-                    radioButton.setText(wordModel.getMeaningCore());
-                }
-                isDone = true;
-                btnAnswer.setVisibility(View.VISIBLE);
-                progressBar.setVisibility(View.INVISIBLE);
-                tv.setText(randomWords.get(currentTrue));
-                Log.d("Request:-> ", "<<----------DONE--------->>");
-
-            }
-        }
-
-    }
+    private List<RadioButton> radioButtons = new ArrayList<>(NUMBER_OF_OPTIONS);
+    private ArrayList<Word> words = new ArrayList<>(NUMBER_OF_OPTIONS);
+    private int indexOfCorrectAnswer;
+    private ProgressBar progressBar;
+    private Button btnAnswer;
+    private TextView tv;
+    private DictionaryReader dr;
+    private DownloadFileProcess downloader;
+    private XmlParser parser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,34 +36,15 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         init();
         btnAnswer.setOnClickListener(v -> {
-
             btnAnswer.setVisibility(View.INVISIBLE);
             progressBar.setVisibility(View.VISIBLE);
-            currentTrue = Math.abs(new Random().nextInt() % 4);
-            requestCounter = 0;
-            requestfinished = 0;
-            isDone = false;
-            uriList.clear();
-            randomWords.clear();
-            for (int i =0;i<4;i++) {
-                getUri();
-            }
 
-            new Thread(() -> {
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                this.runOnUiThread(() -> {
-                    if (!isDone) {
-                        Toast.makeText(getApplicationContext(), "Connection Failed", Toast.LENGTH_SHORT).show();
-                        uriList.clear();
-                    }
-                    btnAnswer.setVisibility(View.VISIBLE);
-                    progressBar.setVisibility(View.INVISIBLE);
-                });
-            }).start();
+            // TODO : handle correct answer selection
+            indexOfCorrectAnswer = Math.abs(new Random().nextInt() % NUMBER_OF_OPTIONS);
+            List<String> randomWords = dr.getRandomWords(NUMBER_OF_OPTIONS);
+            for (String word : randomWords) {
+                downloader.getWordUriFromApi(word);
+            }
         });
 
     }
@@ -106,30 +58,42 @@ public class MainActivity extends Activity {
         btnAnswer = (Button) findViewById(R.id.btnAnswer);
         tv = (TextView) findViewById(R.id.textView);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        dr = new DictionaryReader(R.raw.american_english, this.getBaseContext());
+        dr = new DictionaryReader(R.raw.american_english, this);
+        parser = new XmlParser();
         DownloadFileProcess.createFolder(getApplicationInfo().dataDir, "xmls");
+
+        DownloadFileProcess.ICallbackUri fileDownloadedCallback = uri -> {
+            Word result = parser.getWordData(uri);
+            if (result == null) {
+                requestNewWord();
+            } else {
+                if (words.contains(result)) {
+                    requestNewWord();
+                } else {
+                    words.add(result);
+                    if (words.size() == NUMBER_OF_OPTIONS) {
+                        updateUI();
+                    }
+                }
+            }
+        };
+
+        downloader = new DownloadFileProcess(fileDownloadedCallback, getBaseContext());
 
         radioButtons.add((RadioButton) findViewById(R.id.radioButton));
         radioButtons.add((RadioButton) findViewById(R.id.radioButton2));
         radioButtons.add((RadioButton) findViewById(R.id.radioButton3));
         radioButtons.add((RadioButton) findViewById(R.id.radioButton4));
-
     }
 
-    public void getUri() {
+    private void requestNewWord() {
+        String newWord = dr.getRandomWords(1).get(0);
+        downloader.getWordUriFromApi(newWord);
+    }
 
-        if (!isDone && requestCounter<=4-requestfinished) {
-            requestCounter++;
-            String randomWord = null;
-            do {
-
-                randomWord  = dr.getRandomWords(1).get(0);
-            }
-            while (randomWords.contains(randomWord));
-
-            final String finalRandomWord = randomWord;
-            DownloadFileProcess dfp = new DownloadFileProcess(uri -> request(uri, finalRandomWord), getBaseContext());
-            dfp.getWordUriFromApi(randomWord);
+    private void updateUI() {
+        for (int i = 0; i < NUMBER_OF_OPTIONS; i++) {
+            radioButtons.get(i).setText(words.get(i).getMeaningCore());
         }
     }
 
