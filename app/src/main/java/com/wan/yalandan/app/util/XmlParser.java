@@ -27,18 +27,21 @@ public class XmlParser {
     private static final String TAG_SENSE = "sens";
     private static final String TAG_IT = "it";
     private static final String TAG_ENTRY = "entry";
-
+    private InputStream inStream;
+    private XmlPullParser parser;
+    private XmlPullParserFactory pullParserFactory;
 
     public XmlParser() {
+        try {
+            pullParserFactory = XmlPullParserFactory.newInstance();
+            parser = pullParserFactory.newPullParser();
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        }
     }
 
     public Word getWordData(String uri) {
-        XmlPullParserFactory pullParserFactory;
-        InputStream inStream = null;
         try {
-            pullParserFactory = XmlPullParserFactory.newInstance();
-            XmlPullParser parser = pullParserFactory.newPullParser();
-
             inStream = new FileInputStream(new File(uri));
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(inStream, null);
