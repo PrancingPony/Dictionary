@@ -55,7 +55,7 @@ public class DownloadFileProcess {
     }
 
     public void getWordUriFromApi(String word) {
-        Cursor c = dbInstance.getUri(word, DataStore.ListName.GENERAL);
+        Cursor c = dbInstance.getUri(word, listName);
         if (c.moveToFirst()) {
             successCallback.onSuccess(c.getString(c.getColumnIndex(DataStore.TOKENWORDS_URI)));
             c.close();
@@ -122,7 +122,7 @@ public class DownloadFileProcess {
                                 if (dbInstance == null)
                                     dbInstance = new DataStore(context);
 
-                                dbInstance.insertWord(currentWord, currentUri, DataStore.ListName.GENERAL);
+                                dbInstance.insertWord(currentWord, currentUri, listName);
 
                                 Log.d("URI ", currentWord + " > " + currentUri);
                                 queuedTaskId.poll();

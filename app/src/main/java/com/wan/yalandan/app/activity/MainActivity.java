@@ -40,19 +40,16 @@ public class MainActivity extends Activity {
         init();
         ColorDrawable[] correctAnswer = {new ColorDrawable(Color.argb(255, 150, 250, 150)), new ColorDrawable(Color.WHITE)};
         ColorDrawable[] incorrectAnswer = {new ColorDrawable(Color.argb(255, 250, 150, 150)), new ColorDrawable(Color.WHITE)};
+        TransitionDrawable incorrectAnswerTrans = new TransitionDrawable(incorrectAnswer);
+        TransitionDrawable correctAnswerTrans = new TransitionDrawable(correctAnswer);
         btnAnswer.setOnClickListener(v -> {
-
             if (!radioButtons.get(indexOfCorrectAnswer).isChecked()) {
-                TransitionDrawable trans = new TransitionDrawable(incorrectAnswer);
-                relativeLayout.setBackground(trans);
-                trans.startTransition(1000);
+                relativeLayout.setBackground(incorrectAnswerTrans);
+                incorrectAnswerTrans.startTransition(1000);
                 return;
             }
-
-            TransitionDrawable trans = new TransitionDrawable(correctAnswer);
-            relativeLayout.setBackground(trans);
-            trans.startTransition(1500);
-
+            relativeLayout.setBackground(correctAnswerTrans);
+            correctAnswerTrans.startTransition(1500);
             onClickStartDownload();
         });
         onClickStartDownload();
@@ -83,7 +80,6 @@ public class MainActivity extends Activity {
         dr = new DictionaryReader(R.raw.american_english, this);
         parser = new XmlParser();
         DownloadFileProcess.createFolder(getApplicationInfo().dataDir, "xmls");
-
         DownloadFileProcess.ICallbackUri fileDownloadedCallback = new DownloadFileProcess.ICallbackUri() {
             @Override
             public void onSuccess(String uri) {
@@ -106,13 +102,11 @@ public class MainActivity extends Activity {
             @Override
             public void onFail(String word) {
                 //if (words.contains())
-                    Log.d("TEST", "FAIL DOWNLOAD > " + word);
+                Log.d("TEST", "FAIL DOWNLOAD > " + word);
                 requestNewWord(null);
             }
         };
-
         downloader = new DownloadFileProcess(fileDownloadedCallback, getBaseContext(), DataStore.ListName.GENERAL);
-
         radioButtons.add((RadioButton) findViewById(R.id.radioButton));
         radioButtons.add((RadioButton) findViewById(R.id.radioButton2));
         radioButtons.add((RadioButton) findViewById(R.id.radioButton3));

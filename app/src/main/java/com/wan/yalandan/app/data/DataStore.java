@@ -42,7 +42,7 @@ public class DataStore {
                         TOKENWORDS_WORD + "=?"
                         +" AND "+
                         TOKENWORDS_LISTNUMBER + "=?",
-                        new String[]{word},
+                        new String[]{word, String.valueOf(listName.getId())},
                         null,
                         null,
                         TOKENWORDS_ID);
