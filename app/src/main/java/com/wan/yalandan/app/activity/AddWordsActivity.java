@@ -12,7 +12,6 @@ import com.wan.yalandan.app.R;
 import com.wan.yalandan.app.data.DataStore;
 import com.wan.yalandan.app.model.Word;
 import com.wan.yalandan.app.util.DownloadFileProcess;
-import com.wan.yalandan.app.util.WordUri;
 import com.wan.yalandan.app.util.XmlParser;
 
 import java.text.SimpleDateFormat;
@@ -43,10 +42,10 @@ public class AddWordsActivity extends Activity {
             String word = edtAddText.getText().toString();
 
             for (WordUri w : userWordList) {
-                if (w.word.equals(word)) {
-                    Toast.makeText(this, "Word already added.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                        if(w.word.equals(word)){
+                            Toast.makeText(this,"Word already added.",Toast.LENGTH_SHORT).show();
+                            return;
+                        }
             }
             downloader.getWordUriFromApi(edtAddText.getText().toString());
         });
@@ -82,10 +81,12 @@ public class AddWordsActivity extends Activity {
                                 c.getString(c.getColumnIndex(DataStore.TOKENWORDS_URI)),
                                 c.getLong(c.getColumnIndex(DataStore.TOKENWORDS_DATE)));
                         userWordList.add(0, wordUri);
+
                     }
                 }
                 updateUI(false);
             }
+
 
             @Override
             public void onFail(String word) {
@@ -119,14 +120,29 @@ public class AddWordsActivity extends Activity {
         public View getView(int position, View convertView, ViewGroup parent) {
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
             View rowView = inflater.inflate(R.layout.add_words_listview_item_layout, parent, false);
             TextView wordView = (TextView) rowView.findViewById(R.id.tvListViewWord);
             TextView dateView = (TextView) rowView.findViewById(R.id.tvListViewDate);
+
             Calendar c = Calendar.getInstance();
             c.setTimeInMillis(wordUris.get(position).date);
             wordView.setText(wordUris.get(position).word);
             dateView.setText(simpleDateFormat.format(c.getTime()));
             return rowView;
+        }
+    }
+
+    private class WordUri {
+        public String word;
+        public String uri;
+        public long date;
+
+        WordUri(String word, String uri, long date) {
+            this.word = word;
+            this.uri = uri;
+            this.date = date;
+
         }
     }
 }

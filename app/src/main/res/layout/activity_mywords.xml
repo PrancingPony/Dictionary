@@ -14,14 +14,13 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="Large Text"
-            android:id="@+id/tvMyWordsWord" android:layout_gravity="center_horizontal" android:layout_weight="0.1"/>
+            android:id="@+id/textView2" android:layout_gravity="center_horizontal" android:layout_weight="0.1"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Medium Text"
-            android:id="@+id/tvMyWordsMeaning" android:layout_gravity="center_horizontal" android:layout_weight="0.1"
-            android:paddingLeft="20dp" android:paddingRight="20dp"/>
+            android:id="@+id/textView3" android:layout_gravity="center_horizontal" android:layout_weight="0.1"/>
     <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
@@ -37,11 +36,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="Show Meaning"
-                android:id="@+id/btnMyWordsShowMeaning" android:layout_weight="1"/>
+                android:id="@+id/button5" android:layout_weight="1"/>
         <Button
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="Next Word"
-                android:id="@+id/btnMyWordsNextWord" android:layout_weight="1"/>
+                android:id="@+id/button6" android:layout_weight="1"/>
     </LinearLayout>
 </LinearLayout>

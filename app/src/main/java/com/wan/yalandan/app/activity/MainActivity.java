@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.*;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
     private final static int NUMBER_OF_OPTIONS = 4;
 
     private List<RadioButton> radioButtons = new ArrayList<>(NUMBER_OF_OPTIONS);
