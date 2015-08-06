@@ -38,6 +38,7 @@ public class AddWordsActivity extends Activity {
         init();
 
         btnAddWord.setOnClickListener(v -> {
+            updateUI(true);
             String word = edtAddText.getText().toString();
 
             for (WordUri w : userWordList) {
@@ -72,7 +73,7 @@ public class AddWordsActivity extends Activity {
                 Word word = parser.getWordData(uri);
                 if (word == null) {
                     dataStore.delete(uri);
-                    Toast.makeText(getBaseContext(), "Words mean not found", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), "Meaning of the word not found", Toast.LENGTH_SHORT).show();
                 } else {
                     Cursor c = dataStore.getUri(word.getHeadWord(), DataStore.ListName.USER_DEFINED);
                     if (c.moveToFirst()) {

@@ -83,7 +83,6 @@ public class MainActivity extends Activity {
         dr = new DictionaryReader(R.raw.american_english, this);
         parser = new XmlParser();
         dataStore = new DataStore(this);
-        DownloadFileProcess.createFolder(getApplicationInfo().dataDir, "xmls");
         DownloadFileProcess.ICallbackUri fileDownloadedCallback = new DownloadFileProcess.ICallbackUri() {
             @Override
             public void onSuccess(String uri) {

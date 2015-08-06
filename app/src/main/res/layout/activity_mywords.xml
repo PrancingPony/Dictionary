@@ -35,7 +35,7 @@
         <Button
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:text="Show Mean"
+                android:text="Show Meaning"
                 android:id="@+id/button5" android:layout_weight="1"/>
         <Button
                 android:layout_width="wrap_content"
