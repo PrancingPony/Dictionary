@@ -32,16 +32,19 @@ public class MainActivity extends Activity {
     private DownloadFileProcess downloader;
     private XmlParser parser;
     private RelativeLayout relativeLayout;
+    private DataStore dataStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
+        // TODO: Animation must be in XML
         ColorDrawable[] correctAnswer = {new ColorDrawable(Color.argb(255, 150, 250, 150)), new ColorDrawable(Color.WHITE)};
         ColorDrawable[] incorrectAnswer = {new ColorDrawable(Color.argb(255, 250, 150, 150)), new ColorDrawable(Color.WHITE)};
         TransitionDrawable incorrectAnswerTrans = new TransitionDrawable(incorrectAnswer);
         TransitionDrawable correctAnswerTrans = new TransitionDrawable(correctAnswer);
+        //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         btnAnswer.setOnClickListener(v -> {
             if (!radioButtons.get(indexOfCorrectAnswer).isChecked()) {
                 relativeLayout.setBackground(incorrectAnswerTrans);
@@ -79,12 +82,14 @@ public class MainActivity extends Activity {
         relativeLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
         dr = new DictionaryReader(R.raw.american_english, this);
         parser = new XmlParser();
+        dataStore = new DataStore(this);
         DownloadFileProcess.createFolder(getApplicationInfo().dataDir, "xmls");
         DownloadFileProcess.ICallbackUri fileDownloadedCallback = new DownloadFileProcess.ICallbackUri() {
             @Override
             public void onSuccess(String uri) {
                 Word result = parser.getWordData(uri);
                 if (result == null) {
+                    dataStore.delete(uri);
                     requestNewWord(null);
                 } else {
                     if (words.contains(result)) {
@@ -101,7 +106,6 @@ public class MainActivity extends Activity {
 
             @Override
             public void onFail(String word) {
-                //if (words.contains())
                 Log.d("TEST", "FAIL DOWNLOAD > " + word);
                 requestNewWord(null);
             }

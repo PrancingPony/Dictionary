@@ -11,7 +11,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             DataStore.TOKENWORDS_ID + "   INTEGER     PRIMARY KEY AUTOINCREMENT," +
             DataStore.TOKENWORDS_WORD + " CHAR(50)    NOT NULL," +
             DataStore.TOKENWORDS_URI + "  CHAR(256)   NOT NULL," +
-            DataStore.TOKENWORDS_DATE + " DATE        NOT NULL," +
+            DataStore.TOKENWORDS_DATE + " LONG        NOT NULL," +
             DataStore.TOKENWORDS_LISTNUMBER + "  INTEGER     NOT NULL)";
     private static final int DATABASE_VERSION = 1;
 
