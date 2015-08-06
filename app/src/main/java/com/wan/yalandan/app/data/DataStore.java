@@ -26,26 +26,38 @@ public class DataStore {
         ContentValues contentValues = new ContentValues();
         contentValues.put(TOKENWORDS_WORD, word);
         contentValues.put(TOKENWORDS_URI, uri);
-        contentValues.put(TOKENWORDS_DATE, System.currentTimeMillis() / 1000);
+        contentValues.put(TOKENWORDS_DATE, System.currentTimeMillis());
         contentValues.put(TOKENWORDS_LISTNUMBER, listName.getId());
         long rowId = databaseHelper.
                 getWritableDatabase().
                 insert(TOKENWORDS_TABLENAME, null, contentValues);
         return ContentUris.withAppendedId(Uri.parse(uri), rowId);
     }
-
+    public int delete(String uri) {
+       return databaseHelper.getWritableDatabase().delete(TOKENWORDS_TABLENAME,TOKENWORDS_URI+"=?",new String[]{uri});
+    }
     public Cursor getUri(String word,ListName listName) {
         return databaseHelper.
                 getReadableDatabase().
                 query(TOKENWORDS_TABLENAME,
                         new String[]{TOKENWORDS_ID, TOKENWORDS_WORD, TOKENWORDS_URI, TOKENWORDS_DATE, TOKENWORDS_LISTNUMBER},
                         TOKENWORDS_WORD + "=?"
-                        +" AND "+
-                        TOKENWORDS_LISTNUMBER + "=?",
+                                + " AND " +
+                                TOKENWORDS_LISTNUMBER + "=?",
                         new String[]{word, String.valueOf(listName.getId())},
                         null,
                         null,
                         TOKENWORDS_ID);
+    } public Cursor getWord(ListName listName) {
+        return databaseHelper.
+                getReadableDatabase().
+                query(TOKENWORDS_TABLENAME,
+                        new String[]{TOKENWORDS_ID, TOKENWORDS_WORD, TOKENWORDS_URI, TOKENWORDS_DATE, TOKENWORDS_LISTNUMBER},
+                        TOKENWORDS_LISTNUMBER + "=?",
+                        new String[]{String.valueOf(listName.getId())},
+                        null,
+                        null,
+                        TOKENWORDS_DATE+" DESC");
     }
 
     public enum ListName {
