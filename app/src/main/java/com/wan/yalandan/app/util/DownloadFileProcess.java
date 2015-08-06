@@ -1,6 +1,7 @@
 package com.wan.yalandan.app.util;
 
 import android.app.DownloadManager;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -41,7 +42,6 @@ public class DownloadFileProcess {
 
     public static void createFolder(String path, String folderName) {
         File folder = new File(path + "/" + folderName);
-
         if (!folder.exists()) {
             boolean success = folder.mkdir();
             if (success) {
@@ -62,6 +62,7 @@ public class DownloadFileProcess {
         } else {
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(dictionaryApiURL + word));
             String filename = String.valueOf(UUID.randomUUID());
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN);
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
             queuedTaskId.add(downloadManager.enqueue(request));
         }
@@ -83,6 +84,7 @@ public class DownloadFileProcess {
 
     public interface ICallbackUri {
         void onSuccess(String uri);
+
         void onFail(String word);
     }
 
