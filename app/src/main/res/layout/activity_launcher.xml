@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent" android:weightSum="2">
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_weight="1" android:weightSum="1">
+    </LinearLayout>
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Question Pool"
+            android:id="@+id/btnQuestionPool" android:layout_gravity="center_horizontal"
+            />
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="My Words"
+            android:id="@+id/btnMyWords" android:layout_gravity="center_horizontal"
+            android:layout_alignBaseline="@+id/btnQuestionPool" android:layout_alignBottom="@+id/btnQuestionPool"
+            android:layout_alignLeft="@+id/btnQuestionPool" android:layout_alignStart="@+id/btnQuestionPool"/>
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Words"
+            android:id="@+id/btnAddWords" android:layout_gravity="center_horizontal"/>
+</LinearLayout>

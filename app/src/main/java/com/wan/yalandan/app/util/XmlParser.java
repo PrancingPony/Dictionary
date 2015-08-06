@@ -47,11 +47,9 @@ public class XmlParser {
             parser.setInput(inStream, null);
             return parseXML(parser);
         } catch (XmlPullParserException e) {
-            //TODO : clarify log message
             Log.e(LOG_TAG, "xml pull cant provide stream", e);
         } catch (IOException e) {
-            //TODO : clarify log message
-            Log.e(LOG_TAG, "wrong input,?o exception", e);
+            Log.e(LOG_TAG, "wrong input,io exception", e);
         } finally {
             if (inStream != null) {
                 try {

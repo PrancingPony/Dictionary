@@ -22,24 +22,26 @@ public class DataStore {
         databaseHelper = new DatabaseHelper(ctx);
     }
 
-    public Uri insertWord(String word, String uri) {
+    public Uri insertWord(String word, String uri,ListName listName) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(TOKENWORDS_WORD, word);
         contentValues.put(TOKENWORDS_URI, uri);
         contentValues.put(TOKENWORDS_DATE, System.currentTimeMillis() / 1000);
-        contentValues.put(TOKENWORDS_LISTNUMBER, ListName.GENERAL.getId());
+        contentValues.put(TOKENWORDS_LISTNUMBER, listName.getId());
         long rowId = databaseHelper.
                 getWritableDatabase().
                 insert(TOKENWORDS_TABLENAME, null, contentValues);
         return ContentUris.withAppendedId(Uri.parse(uri), rowId);
     }
 
-    public Cursor getUri(String word) {
+    public Cursor getUri(String word,ListName listName) {
         return databaseHelper.
                 getReadableDatabase().
                 query(TOKENWORDS_TABLENAME,
                         new String[]{TOKENWORDS_ID, TOKENWORDS_WORD, TOKENWORDS_URI, TOKENWORDS_DATE, TOKENWORDS_LISTNUMBER},
-                        TOKENWORDS_WORD + "=?",
+                        TOKENWORDS_WORD + "=?"
+                        +" AND "+
+                        TOKENWORDS_LISTNUMBER + "=?",
                         new String[]{word},
                         null,
                         null,

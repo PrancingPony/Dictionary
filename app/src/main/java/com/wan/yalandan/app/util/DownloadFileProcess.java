@@ -14,27 +14,29 @@ import com.wan.yalandan.app.R;
 import com.wan.yalandan.app.data.DataStore;
 
 import java.io.*;
-import java.util.UUID;
+import java.util.*;
 
 public class DownloadFileProcess {
 
     private final String dictionaryApiURL;
-    private long queuedTaskId;
+    private Queue<Long> queuedTaskId;
     private Context context;
     private DataStore dbInstance;
     private DownloadManager downloadManager;
     private ICallbackUri successCallback;
-    private DownloadStatusReceiver receiver;
-
-    public DownloadFileProcess(ICallbackUri _callback, Context _context) {
+    public DownloadStatusReceiver receiver;
+    private DataStore.ListName listName;
+    public DownloadFileProcess(ICallbackUri _callback, Context _context,DataStore.ListName listName) {
         context = _context;
         successCallback = _callback;
+        this.listName = listName;
         receiver = new DownloadStatusReceiver();
         context.registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         Resources resources = context.getResources();
         dictionaryApiURL = String.format("%s?key=%s&word=", resources.getString(R.string.DictionarySite), resources.getString(R.string.KeyParam));
         downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         dbInstance = new DataStore(context);
+        queuedTaskId = new LinkedList<>();
     }
 
     public static void createFolder(String path, String folderName) {
@@ -53,7 +55,7 @@ public class DownloadFileProcess {
     }
 
     public void getWordUriFromApi(String word) {
-        Cursor c = dbInstance.getUri(word);
+        Cursor c = dbInstance.getUri(word, DataStore.ListName.GENERAL);
         if (c.moveToFirst()) {
             successCallback.onSuccess(c.getString(c.getColumnIndex(DataStore.TOKENWORDS_URI)));
             c.close();
@@ -61,7 +63,7 @@ public class DownloadFileProcess {
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(dictionaryApiURL + word));
             String filename = String.valueOf(UUID.randomUUID());
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
-            queuedTaskId = downloadManager.enqueue(request);
+            queuedTaskId.add(downloadManager.enqueue(request));
         }
     }
 
@@ -90,7 +92,7 @@ public class DownloadFileProcess {
         public void onReceive(Context context, Intent intent) {
             if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(intent.getAction())) {
                 DownloadManager.Query query = new DownloadManager.Query();
-                query.setFilterById(queuedTaskId);
+                query.setFilterById(queuedTaskId.peek());
                 Cursor c = downloadManager.query(query);
                 if (c.moveToFirst()) {
                     int columnIndex = c.getColumnIndex(DownloadManager.COLUMN_STATUS);
@@ -102,6 +104,7 @@ public class DownloadFileProcess {
 
                     switch (c.getInt(columnIndex)) {
                         case DownloadManager.STATUS_SUCCESSFUL:
+                            queuedTaskId.remove(0);
                             String uriString = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
                             String[] seperateToPath = uriString.split("/");
                             String fileName = seperateToPath[seperateToPath.length - 1];
@@ -119,16 +122,19 @@ public class DownloadFileProcess {
                                 if (dbInstance == null)
                                     dbInstance = new DataStore(context);
 
-                                dbInstance.insertWord(currentWord, currentUri);
+                                dbInstance.insertWord(currentWord, currentUri, DataStore.ListName.GENERAL);
 
                                 Log.d("URI ", currentWord + " > " + currentUri);
+                                queuedTaskId.poll();
                                 successCallback.onSuccess(currentUri);
+
                             } catch (IOException e) {
                                 Log.e("readFile Error", "There is an error about IO Exception", e);
                             } finally {
                                 c.close();
                             }
                             break;
+
                         default:
                             successCallback.onFail(currentWord);
                             break;

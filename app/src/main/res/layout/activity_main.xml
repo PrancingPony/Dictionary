@@ -36,23 +36,20 @@
             <RadioGroup
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal">
+                    android:layout_gravity="center_horizontal" android:id="@+id/radioGroup">
                 <RadioButton
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="New RadioButton"
                         android:id="@+id/radioButton"
                         android:checked="false"/>
                 <RadioButton
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="New RadioButton"
-                        android:id="@+id/radioButton2"/>
+                        android:id="@+id/radioButton2" android:checked="false"/>
                 <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content"
-                             android:text="New RadioButton" android:id="@+id/radioButton3"/>
+                             android:id="@+id/radioButton3" android:checked="false"/>
                 <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content"
-                             android:text="New RadioButton"
-                             android:id="@+id/radioButton4"/>
+                             android:id="@+id/radioButton4" android:checked="false"/>
             </RadioGroup>
         </LinearLayout>
     </RelativeLayout>
