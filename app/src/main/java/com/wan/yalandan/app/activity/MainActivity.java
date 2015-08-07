@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -27,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Word> words = new ArrayList<>(NUMBER_OF_OPTIONS);
     private int indexOfCorrectAnswer;
     private ProgressBar progressBar;
-    private Button btnAnswer;
+    private FloatingActionButton  btnAnswer;
     private TextView tv;
     private DictionaryReader dr;
     private DownloadFileProcess downloader;
@@ -39,8 +40,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         init();
         // TODO: Animation must be in XML
-        ColorDrawable[] correctAnswer = {new ColorDrawable(Color.argb(255, 150, 250, 150)), new ColorDrawable(Color.WHITE)};
-        ColorDrawable[] incorrectAnswer = {new ColorDrawable(Color.argb(255, 250, 150, 150)), new ColorDrawable(Color.WHITE)};
+        ColorDrawable[] correctAnswer = {new ColorDrawable(Color.argb(255, 150, 250, 150)), new ColorDrawable(Color.argb(255, 243, 243, 243))};
+        ColorDrawable[] incorrectAnswer = {new ColorDrawable(Color.argb(255, 250, 150, 150)), new ColorDrawable(Color.argb(255, 243, 243, 243))};
         TransitionDrawable incorrectAnswerTrans = new TransitionDrawable(incorrectAnswer);
         TransitionDrawable correctAnswerTrans = new TransitionDrawable(correctAnswer);
         //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -75,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void init() {
-        btnAnswer = (Button) findViewById(R.id.btnAnswer);
+        btnAnswer = (FloatingActionButton) findViewById(R.id.btnAnswer);
         tv = (TextView) findViewById(R.id.textView);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         relativeLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
