@@ -59,15 +59,6 @@ public class AddWordsActivity extends Activity {
         progressBarWordLoading = (ProgressBar) findViewById(R.id.progressBarAddWords);
         parser = new XmlParser();
         dataStore = new DataStore(this);
-        Cursor c = dataStore.getWord(DataStore.ListName.USER_DEFINED);
-        while (c.moveToNext()) {
-            WordUri wordUri = new WordUri(c.getString(c.getColumnIndex(DataStore.TOKENWORDS_WORD)),
-                    c.getString(c.getColumnIndex(DataStore.TOKENWORDS_URI)),
-                    c.getLong(c.getColumnIndex(DataStore.TOKENWORDS_DATE)));
-            userWordList.add(wordUri);
-        }
-        c.close();
-        listOfAddedWords.setAdapter(new MobileArrayAdapter(this, userWordList));
         DownloadFileProcess.ICallbackUri fileDownloadedCallback = new DownloadFileProcess.ICallbackUri() {
             @Override
             public void onSuccess(String uri) {
@@ -92,6 +83,15 @@ public class AddWordsActivity extends Activity {
             }
         };
         downloader = new DownloadFileProcess(fileDownloadedCallback, getBaseContext(), DataStore.ListName.USER_DEFINED);
+        Cursor c = dataStore.getWord(DataStore.ListName.USER_DEFINED);
+        while (c.moveToNext()) {
+            WordUri wordUri = new WordUri(c.getString(c.getColumnIndex(DataStore.TOKENWORDS_WORD)),
+                    c.getString(c.getColumnIndex(DataStore.TOKENWORDS_URI)),
+                    c.getLong(c.getColumnIndex(DataStore.TOKENWORDS_DATE)));
+            userWordList.add(wordUri);
+        }
+        c.close();
+        listOfAddedWords.setAdapter(new MobileArrayAdapter(this, userWordList));
     }
 
     private void updateUI(boolean state) {

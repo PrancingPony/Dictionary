@@ -32,8 +32,6 @@ public class MainActivity extends Activity {
     private DownloadFileProcess downloader;
     private XmlParser parser;
     private RelativeLayout relativeLayout;
-    private DataStore dataStore;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,13 +80,11 @@ public class MainActivity extends Activity {
         relativeLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
         dr = new DictionaryReader(R.raw.american_english, this);
         parser = new XmlParser();
-        dataStore = new DataStore(this);
         DownloadFileProcess.ICallbackUri fileDownloadedCallback = new DownloadFileProcess.ICallbackUri() {
             @Override
             public void onSuccess(String uri) {
                 Word result = parser.getWordData(uri);
                 if (result == null) {
-                    dataStore.delete(uri);
                     requestNewWord(null);
                 } else {
                     if (words.contains(result)) {
