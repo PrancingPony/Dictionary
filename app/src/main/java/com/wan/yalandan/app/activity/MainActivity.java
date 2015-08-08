@@ -1,9 +1,9 @@
 package com.wan.yalandan.app.activity;
 
-import android.app.Activity;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.TransitionDrawable;
+import android.animation.AnimatorInflater;
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -33,26 +33,23 @@ public class MainActivity extends AppCompatActivity {
     private DictionaryReader dr;
     private DownloadFileProcess downloader;
     private XmlParser parser;
-    private RelativeLayout relativeLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
-        // TODO: Animation must be in XML
-        ColorDrawable[] correctAnswer = {new ColorDrawable(Color.argb(255, 150, 250, 150)), new ColorDrawable(Color.argb(255, 243, 243, 243))};
-        ColorDrawable[] incorrectAnswer = {new ColorDrawable(Color.argb(255, 250, 150, 150)), new ColorDrawable(Color.argb(255, 243, 243, 243))};
-        TransitionDrawable incorrectAnswerTrans = new TransitionDrawable(incorrectAnswer);
-        TransitionDrawable correctAnswerTrans = new TransitionDrawable(correctAnswer);
-        //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        ObjectAnimator animatorCorrect = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.animator_correct);
+        ObjectAnimator animatorIncorrect = (ObjectAnimator) AnimatorInflater.loadAnimator(this, R.animator.animator_incorrect);
+        animatorIncorrect.setTarget(tv);
+        animatorIncorrect.setEvaluator(new ArgbEvaluator());
+        animatorCorrect.setTarget(tv);
+        animatorCorrect.setEvaluator(new ArgbEvaluator());
         btnAnswer.setOnClickListener(v -> {
             if (!radioButtons.get(indexOfCorrectAnswer).isChecked()) {
-                relativeLayout.setBackground(incorrectAnswerTrans);
-                incorrectAnswerTrans.startTransition(1000);
+                animatorIncorrect.start();
                 return;
             }
-            relativeLayout.setBackground(correctAnswerTrans);
-            correctAnswerTrans.startTransition(1500);
+            animatorCorrect.start();
             onClickStartDownload();
         });
         onClickStartDownload();
@@ -79,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
         btnAnswer = (FloatingActionButton) findViewById(R.id.btnAnswer);
         tv = (TextView) findViewById(R.id.textView);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        relativeLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
         dr = new DictionaryReader(R.raw.american_english, this);
         parser = new XmlParser();
         DownloadFileProcess.ICallbackUri fileDownloadedCallback = new DownloadFileProcess.ICallbackUri() {
