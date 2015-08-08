@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <objectAnimator xmlns:android="http://schemas.android.com/apk/res/android"
                 android:propertyName="backgroundColor"
-                android:valueFrom="#7D7"
-                android:valueTo="#DDD"
+                android:valueFrom="#FF88DD88"
+                android:valueTo="#FFF0F0F0"
                 android:duration="1618"
         />
