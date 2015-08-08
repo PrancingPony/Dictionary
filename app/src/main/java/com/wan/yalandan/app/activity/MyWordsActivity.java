@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.wan.yalandan.app.R;
 import com.wan.yalandan.app.data.DataStore;
 import com.wan.yalandan.app.model.Word;
@@ -50,13 +51,19 @@ public class MyWordsActivity extends Activity {
             userWordList.add(wordUri);
         }
         cursor.close();
+
+        if(userWordList.isEmpty())
+        {
+            Toast.makeText(getBaseContext(),"Your own word list has not any word",Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
         nextWord();
     }
 
     private int selectRandomWord() {
         return Math.abs(random.nextInt()) % userWordList.size();
     }
-
     private void nextWord() {
         indexOfCurrentWord = selectRandomWord();
         tvWord.setText(userWordList.get(indexOfCurrentWord).word);
